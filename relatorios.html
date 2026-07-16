@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Relatórios / BI - Next Agrolink</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-text">NEXT <span>agrolink</span></div>
+        <button class="icon-btn only-mobile" id="closeSidebar">×</button>
+      </div>
+
+      <div class="nav-scroll">
+        <p class="nav-title">Principal</p>
+        <button class="nav-item " onclick="location.href='index.html'">▣ Dashboard</button>
+
+        <p class="nav-title">Comercial</p>
+        <button class="nav-item " onclick="location.href='clientes.html'">👤 Clientes</button>
+        <button class="nav-item " onclick="location.href='pedidos.html'">▤ Pedidos</button>
+        <button class="nav-item " onclick="location.href='vendas.html'">R$ Vendas</button>
+        <button class="nav-item " onclick="location.href='comissoes.html'">% Comissões</button>
+
+        <p class="nav-title">Produtos</p>
+        <button class="nav-item " onclick="location.href='produtos.html'">✦ Lista de Produtos</button>
+        <button class="nav-item " onclick="location.href='cadastro-produto.html'">＋ Cadastro Produto</button>
+        <button class="nav-item " onclick="location.href='precos.html'">⌑ Categorias e Preços</button>
+
+        <p class="nav-title">Operação</p>
+        <button class="nav-item " onclick="location.href='estoque.html'">▥ Estoque</button>
+        <button class="nav-item " onclick="location.href='producao.html'">⚙ Produção</button>
+        <button class="nav-item " onclick="location.href='qualidade.html'">✓ Qualidade</button>
+        <button class="nav-item " onclick="location.href='logistica.html'">⇄ Logística</button>
+
+        <p class="nav-title">Gestão</p>
+        <button class="nav-item " onclick="location.href='financeiro.html'">◈ Financeiro</button>
+        <button class="nav-item active" onclick="location.href='relatorios.html'">▰ Relatórios / BI</button>
+        <button class="nav-item " onclick="location.href='auditoria.html'">🛡 Auditoria</button>
+        <button class="nav-item " onclick="location.href='configuracoes.html'">⚙ Configurações</button>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="footer-btn" onclick="location.href='configuracoes.html'">Editar Perfil</button>
+        <button class="footer-btn primary" onclick="showToast('Saída simulada. Em sistema real, encerraria a sessão.'); setTimeout(()=>location.href='index.html',1500)">Sair</button>
+      </div>
+    </aside>
+
+    <div class="overlay" id="overlay"></div>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="hamburger" id="openSidebar">☰</button>
+        <div>
+          <strong id="breadcrumb">Next Agrolink / Relatórios / BI</strong>
+          <small>Protótipo funcional </small>
+        </div>
+        <input id="globalSearch" class="search" placeholder="Pesquisar no sistema...">
+        <div class="user-pill"><span>Bruno Cavalcante</span><b>B</b></div>
+      </header>
+
+      <section class="content" id="content">
+        
+      </section>
+    </main>
+  </div>
+
+  <nav class="bottom-nav">
+    <button onclick="location.href='index.html'">▣<span>Início</span></button>
+    <button onclick="location.href='pedidos.html'">▤<span>Pedidos</span></button>
+    <button onclick="location.href='clientes.html'">👤<span>Clientes</span></button>
+    <button onclick="location.href='produtos.html'">✦<span>Produtos</span></button>
+    <button onclick="location.href='relatorios.html'">▰<span>BI</span></button>
+  </nav>
+
+  <div class="modal" id="modal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="modalTitle">Modal</h2>
+        <button class="icon-btn" id="modalClose">×</button>
+      </div>
+      <div id="modalBody"></div>
+      <div class="modal-actions">
+        <button class="btn secondary" id="modalCancel">Cancelar</button>
+        <button class="btn primary" id="modalConfirm">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+const state = {
+  page: 'relatorios',
+  selectedProduct: null,
+  selectedClient: null,
+  selectedOrder: null,
+  dashboardMonths: ['Jun','Jul','Ago','Set','Out','Nov','Dez','Jan','Fev','Mar','Abr','Mai'],
+  dashboardSales: [27680,30000,26680,19680,7680,14680,17680,19680,37680,42680,35680,40680],
+  clientes: [
+    {id:1, nome:'DORNELLES REOLON', telefone:'67 99853-1578', documento:'39.597.359/0002-76', cidade:'Douradina', uf:'MS', area:'780 ha', fazenda:'Água Fria', culturas:'Soja / Milho', potencial:'Alto', status:'Ativo'},
+    {id:2, nome:'DOUGLAS DE CARVALHO', telefone:'67 99785-1945', documento:'12.456.789/0001-55', cidade:'Rio Brilhante', uf:'MS', area:'1200 ha', fazenda:'Santa Luzia', culturas:'Soja', potencial:'Estratégico', status:'Ativo'},
+    {id:3, nome:'DUQUE BASSO', telefone:'67 99492-3451', documento:'48.229.100/0001-18', cidade:'Sidrolândia', uf:'MS', area:'2500 ha', fazenda:'Boa Vista', culturas:'Soja / Milho / Trigo', potencial:'Estratégico', status:'Ativo'},
+    {id:4, nome:'EBILTON DONATTO DOS SANTOS', telefone:'67 99853-5592', documento:'28.331.891/0001-20', cidade:'Ponta Porã', uf:'MS', area:'1650 ha', fazenda:'Sol Nascente', culturas:'Milho', potencial:'Alto', status:'Ativo'},
+    {id:5, nome:'EDEMAR COSTA CONTAR', telefone:'67 99332-6716', documento:'22.671.998/0001-03', cidade:'Sidrolândia', uf:'MS', area:'380 ha', fazenda:'São Bento', culturas:'Pecuária', potencial:'Médio', status:'Ativo'},
+    {id:6, nome:'EDEMILSON LUIZ VIEIRA', telefone:'67 99598-1578', documento:'91.119.780/0001-88', cidade:'Laguna Carapã', uf:'MS', area:'600 ha', fazenda:'Santa Maria', culturas:'Soja', potencial:'Alto', status:'Ativo'}
+  ],
+  produtos: [
+    {id:1, nome:'Powerful - Macrofitotônico', sku:'POWER-MACRO', embalagem:'Saco 25kg', unidade:'Kg', natureza:'Farelado', categoria:'Fertilizante', estoque:1480, reservado:260, lote:'PF-2601', validade:'30/11/2026', status:'Liberado', preco:3800, comissao:7.55},
+    {id:2, nome:'Patriot - Complexo Nutricional Sistêmico', sku:'PATRIOT-NUTRI', embalagem:'Saco 25kg', unidade:'Kg', natureza:'Farelado', categoria:'Fertilizante', estoque:820, reservado:170, lote:'PT-2602', validade:'15/12/2026', status:'Liberado', preco:3950, comissao:7.55},
+    {id:3, nome:'Marvin Complexo - Ativador', sku:'MARVIN-ATIV', embalagem:'Saco 25kg', unidade:'Kg', natureza:'Farelado', categoria:'Bioinsumo', estoque:560, reservado:80, lote:'MC-2601', validade:'22/10/2026', status:'Liberado', preco:3600, comissao:6.8},
+    {id:4, nome:'Magnetto - Complexo Nitropotássico', sku:'MAG-NITRO', embalagem:'Saco 25kg', unidade:'Kg', natureza:'Farelado', categoria:'Fertilizante', estoque:1200, reservado:340, lote:'MG-2604', validade:'01/02/2027', status:'Liberado', preco:4100, comissao:8.0},
+    {id:5, nome:'Shellt MV - Adjuvante Completo', sku:'SHELLT-MV', embalagem:'Saco 25kg', unidade:'Kg', natureza:'Farelado', categoria:'Adjuvante', estoque:290, reservado:90, lote:'SH-2603', validade:'09/09/2026', status:'Atenção', preco:2200, comissao:5.5},
+    {id:6, nome:'Haxor Orange - Óleo de Laranja', sku:'HAXOR-ORANGE', embalagem:'Saco 25kg', unidade:'Kg', natureza:'Farelado', categoria:'Adjuvante', estoque:410, reservado:60, lote:'HO-2601', validade:'18/01/2027', status:'Liberado', preco:2500, comissao:5.8}
+  ],
+  pedidos: [
+    {id:'000126', data:'12/06/2025', cliente:'DORNELLES REOLON', representante:'Bruno Cavalcante', cidade:'Douradina/MS', valor:36475.84, status:'Em análise', vencimento:'30/03/2027', pago:0},
+    {id:'000178', data:'03/07/2025', cliente:'DOUGLAS DE CARVALHO', representante:'Ana Pereira', cidade:'Rio Brilhante/MS', valor:68768.65, status:'Faturado', vencimento:'30/03/2027', pago:0},
+    {id:'000251', data:'26/08/2025', cliente:'DUQUE BASSO', representante:'Carlos Lima', cidade:'Sidrolândia/MS', valor:121769.18, status:'Autorizado', vencimento:'30/03/2027', pago:0},
+    {id:'000363', data:'12/06/2025', cliente:'EBILTON DONATTO DOS SANTOS', representante:'Bruno Cavalcante', cidade:'Ponta Porã/MS', valor:47352.97, status:'Entregue', vencimento:'30/03/2027', pago:47352.97},
+    {id:'000149', data:'04/05/2026', cliente:'DORNELLES REOLON', representante:'Bruno Cavalcante', cidade:'Rio Verde/GO', valor:18886.25, status:'Entregue', vencimento:'30/03/2027', pago:18886.25}
+  ],
+  representantes: [
+    {id:1, nome:'Bruno Cavalcante', regiao:'MS Sul', meta:250000, vendido:210000, carteira:58, comissao:15855, status:'Ativo'},
+    {id:2, nome:'Ana Pereira', regiao:'GO', meta:200000, vendido:172000, carteira:42, comissao:12986, status:'Ativo'},
+    {id:3, nome:'Carlos Lima', regiao:'MT', meta:180000, vendido:145000, carteira:37, comissao:10947, status:'Meta parcial'}
+  ]
+};
+const BRL = v => Number(v || 0).toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+const cls = status => {
+  const s = String(status || '').toLowerCase();
+  if(s.includes('ativo') || s.includes('liberado') || s.includes('entregue') || s.includes('aprov') || s.includes('receb') || s.includes('pago')) return 'ok';
+  if(s.includes('faturado') || s.includes('autorizado') || s.includes('em transporte')) return 'info';
+  if(s.includes('cancel') || s.includes('venc') || s.includes('bloque') || s.includes('reprov')) return 'danger';
+  return 'pending';
+};
+const badge = s => `<span class="badge ${cls(s)}">${s}</span>`;
+const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+function showToast(msg){
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2400);
+}
+
+function modal(title, body, onConfirm, confirmText='Confirmar'){
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = body;
+  document.getElementById('modalConfirm').textContent = confirmText;
+  const m = document.getElementById('modal');
+  m.classList.add('open');
+  const confirm = document.getElementById('modalConfirm');
+  confirm.onclick = () => {
+    if(onConfirm) onConfirm();
+    m.classList.remove('open');
+  };
+}
+function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+
+function pageHead(title, subtitle, actions=''){
+  return `<div class="page-head"><div><h1>${title}</h1><p class="subtitle">${subtitle}</p></div><div class="actions">${actions}</div></div>`;
+}
+function filters(fields){
+  return `<div class="card filters"><div class="form-grid">${
+    fields.map(f => `<div class="field"><label>${f.label}</label>${f.type==='select'
+      ? `<select id="${f.id||''}">${(f.options||['Todos']).map(o=>`<option>${o}</option>`).join('')}</select>`
+      : `<input id="${f.id||''}" placeholder="${f.placeholder||''}" value="${f.value||''}">`}${f.small?`<small>${f.small}</small>`:''}</div>`).join('')
+  }</div></div>`;
+}
+function table(headers, rows, empty='Nenhum registro encontrado.'){
+  return `<div class="table-wrap"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.length?rows.join(''):`<tr><td colspan="${headers.length}" class="empty">${empty}</td></tr>`}</tbody></table></div>`;
+}
+function kpis(items){
+  return `<div class="kpi-grid">${items.map(i=>`<div class="card kpi"><div class="kpi-icon ${i.c}">${i.icon}</div><div><span>${i.label}</span><strong>${i.value}</strong></div></div>`).join('')}</div>`;
+}
+
+function input(id,label,value='',extra=''){ return `<div class="field ${extra}"><label>${label}</label><input id="${id}" value="${esc(value)}"></div>`; }
+function select(id,label,options,value='',extra=''){ return `<div class="field ${extra}"><label>${label}</label><select id="${id}">${options.map(o=>`<option ${o==value?'selected':''}>${o}</option>`).join('')}</select></div>`; }
+function textarea(id,label,value='',extra=''){ return `<div class="field ${extra}"><label>${label}</label><textarea id="${id}">${esc(value)}</textarea></div>`; }
+function detail(label,value){ return `<div class="detail"><label>${label}</label><span>${value}</span></div>`; }
+function getFormData(ids){ const obj={}; ids.forEach(id=>{ const el=document.getElementById(id); obj[id]=el?el.value:''; }); return obj; }
+function exportar(nome){ showToast(`Exportação de ${nome} simulada com sucesso`); }
+
+function chart(){
+  const max = Math.max(...state.dashboardSales);
+  return `<div class="chart">${state.dashboardSales.map((v,i)=>`<div class="bar-item"><span>${BRL(v)}</span><div class="bar" style="height:${Math.max(32, v/max*190)}px"></div><small>${state.dashboardMonths[i]}</small></div>`).join('')}</div>`;
+}
+function statesVolume(){
+  return `<div class="stat-list">
+    ${[['MS','R$ 312.450,00',82],['GO','R$ 198.200,00',56],['MT','R$ 125.800,00',38],['PR','R$ 94.600,00',25]].map(r =>
+      `<div><div class="stat-row"><span>${r[0]}</span><strong>${r[1]}</strong></div><div class="progress"><i style="width:${r[2]}%"></i></div></div>`).join('')}
+  </div>`;
+}
+function simplePanel(title, items){
+  return `<div class="card panel"><div class="panel-title"><h2>${title}</h2></div><div class="stat-list">${items.map(i=>`<div class="stat-row"><span>${i[0]}</span><strong>${i[1]}</strong></div>`).join('')}</div></div>`;
+}
+function genericModule(title, subtitle, kpiItems, rows){
+  return pageHead(title, subtitle, `<button class="btn secondary" onclick="exportar('${title}')">Exportar</button><button class="btn primary" onclick="showToast('Novo registro criado no protótipo')">Novo Registro</button>`) + kpis(kpiItems) + genericModuleTable(rows, title);
+}
+function moduleWithTable(title, subtitle, kpiHtml, tableHtml, actions=''){
+  return pageHead(title, subtitle, actions) + kpiHtml + `<div class="card panel">${tableHtml}</div>`;
+}
+function genericModuleTable(rows, title='Registros'){
+  return `<div class="card panel"><div class="panel-title"><h2>${title}</h2><span>Next Agrolink</span></div>${table(['Item','Descrição','Responsável','Status','Última atualização'], rows.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${badge(r[3])}</td><td>${r[4]}</td></tr>`))}</div>`;
+}
+
+function tabName(t){return {dados:'Dados Gerais',agro:'Agronômico',regulatorio:'Regulatório',logistica:'Logística',estoque:'Estoque',comercial:'Comercial',geo:'Geografia',docs:'Documentos',producao:'Produção'}[t];}
+function produtoSection(id,title,inner,active=false){return `<section id="tab-${id}" class="tab-content ${active?'active':''}"><div class="card panel"><h2>${title}</h2><div class="form-grid">${inner}</div></div></section>`;}
+function openTab(id, el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+}
+function fakeUpload(name){ showToast(`${name} anexado ao protótipo`); }
+
+function orderRow(p){
+  return `<tr><td><button class="link-btn" onclick="location.href='pedido-detalhe.html?id=${p.id}'">${p.id}</button></td><td>${p.data}</td><td>${esc(p.cliente)}</td><td>${p.representante}</td><td>${p.cidade}</td><td>${BRL(p.valor)}</td><td>${badge(p.status)}</td><td><div class="table-actions"><button class="link-btn" onclick="location.href='pedido-detalhe.html?id=${p.id}'">Ver</button><button class="link-btn" onclick="editarPedido('${p.id}')">Editar</button><button class="link-btn danger" onclick="excluirPedido('${p.id}')">Excluir</button></div></td></tr>`;
+}
+function relatorios(){ return pageHead('Relatórios / BI','Vendas por estado, cidade, produto, representante, cliente, comissão e período.',
+  `<button class="btn secondary" onclick="exportar('relatórios')">Exportar PDF</button>`) +
+  kpis([{icon:'▰',label:'Dashboards',value:'5',c:'p'},{icon:'MS',label:'Top Estado',value:'R$ 312k',c:'g'},{icon:'TOP',label:'Top Produto',value:'OM 02-10-06',c:'b'},{icon:'%',label:'Comissão paga',value:'R$ 15,7k',c:'y'}]) +
+  `<div class="grid-2"><div class="card panel"><h2>Vendas por mês</h2>${chart()}</div><div class="card panel"><h2>Estados com maior volume</h2>${statesVolume()}</div></div>` +
+  genericModuleTable([['BI-VENDAS','Vendas por Estado, Cidade, Produto e Representante','Diretoria','Atualizado','Hoje'],['BI-COM','Comissão por representante, produto e período','Financeiro','Atualizado','Hoje'],['BI-CLI','Clientes estratégicos e potencial agrícola','Comercial','Atualizado','Hoje']]);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('openSidebar').onclick = () => {document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('open');};
+  document.getElementById('closeSidebar').onclick = () => {document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open');};
+  document.getElementById('overlay').onclick = () => {document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open');};
+  document.getElementById('modalClose').onclick = closeModal;
+  document.getElementById('modalCancel').onclick = closeModal;
+  document.getElementById('globalSearch').addEventListener('input', () => {
+    if(['clientes','produtos','pedidos'].includes(state.page)) render();
+  });
+  render();
+});
+
+function render(){
+  const content = document.getElementById('content');
+  content.innerHTML = relatorios();
+}
+  </script>
+</body>
+</html>

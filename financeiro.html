@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Financeiro - Next Agrolink</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .fin-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+    .fin-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+    .fin-kpi-big{padding:22px 20px}
+    .fin-kpi-big .kpi-icon{width:52px;height:52px;border-radius:14px;font-size:18px}
+    .fin-kpi-big strong{font-size:26px}
+    .fin-kpi-big .trend{font-size:12px;color:var(--muted);margin-top:4px;font-weight:700}
+    .fin-kpi-big .trend.up{color:#15803d}
+    .fin-kpi-big .trend.down{color:var(--red)}
+    .badge.parcial{background:#fef3c7;color:#a16207}
+    .badge.vencido{background:var(--red-soft);color:var(--red)}
+    .fin-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+    .fin-actions .btn{min-height:36px;padding:0 14px;font-size:13px}
+    .fin-section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:32px 0 16px}
+    .fin-section-title h2{margin:0;font-size:18px}
+    .fin-section-title span{color:var(--muted);font-size:13px;font-weight:700}
+    .progress-bar{height:8px;background:#edf2f7;border-radius:99px;overflow:hidden;margin-top:6px}
+    .progress-bar i{display:block;height:100%;border-radius:99px}
+    .fin-card-highlight{border-left:4px solid var(--primary)}
+    .fin-card-highlight.red{border-left-color:var(--red)}
+    .fin-card-highlight.yellow{border-left-color:var(--yellow)}
+    .fin-card-highlight.green{border-left-color:var(--green)}
+    .fin-row-detail{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+    .fin-row-detail div{text-align:center}
+    .fin-row-detail div label{display:block;font-size:11px;color:var(--muted);font-weight:800;margin-bottom:2px}
+    .fin-row-detail div span{font-size:14px;font-weight:800;color:var(--text)}
+    .chart-area{height:220px;position:relative;padding:16px 12px 32px;border-bottom:2px solid var(--line);display:flex;align-items:flex-end;gap:8px}
+    .chart-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px}
+    .chart-bars{display:flex;align-items:flex-end;gap:3px;width:100%;justify-content:center}
+    .chart-bar{width:18px;border-radius:4px 4px 0 0;transition:all .3s}
+    .chart-bar.entrada{background:var(--green)}
+    .chart-bar.saida{background:var(--red);opacity:.7}
+    .chart-col label{font-size:10px;color:var(--muted);font-weight:800;margin-top:4px}
+    .chart-col .val{font-size:9px;font-weight:800;color:var(--muted);white-space:nowrap}
+    .chart-legend{display:flex;gap:20px;justify-content:center;margin-top:12px;font-size:12px;font-weight:800}
+    .chart-legend span{display:flex;align-items:center;gap:6px}
+    .chart-legend .dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+    .doughnut-wrap{width:130px;height:130px;position:relative;margin:auto;flex-shrink:0}
+    .doughnut-wrap svg{transform:rotate(-90deg)}
+    .doughnut-center{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+    .doughnut-center strong{font-size:18px;color:var(--text)}
+    .doughnut-center span{font-size:10px;color:var(--muted);font-weight:800}
+    .legend-grid{display:grid;gap:10px}
+    .legend-row{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700}
+    .legend-dot{width:10px;height:10px;border-radius:3px}
+    .legend-row span{flex:1;color:var(--muted)}
+    .legend-row strong{color:var(--text);font-size:14px}
+    .comissao-card{background:white;border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);display:flex;align-items:center;gap:14px}
+    .comissao-card .avatar-mini{width:44px;height:44px;font-size:16px}
+    .comissao-card .info{flex:1}
+    .comissao-card .info h4{margin:0 0 4px;font-size:15px}
+    .comissao-card .info p{margin:0;color:var(--muted);font-size:12px;font-weight:700}
+    .comissao-card .valor{text-align:right}
+    .comissao-card .valor strong{font-size:18px;color:var(--primary)}
+    .comissao-card .valor span{font-size:11px;color:var(--muted);font-weight:800}
+    .mini-stat{display:flex;gap:16px;margin-top:8px}
+    .mini-stat div{font-size:12px;font-weight:800;color:var(--muted)}
+    .mini-stat div strong{color:var(--text);font-size:13px}
+    .status-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:900}
+    .status-pill.ok{background:var(--green-soft);color:#15803d}
+    .status-pill.pending{background:var(--yellow-soft);color:#a16207}
+    .status-pill.danger{background:var(--red-soft);color:var(--red)}
+    .grafico-linha{height:200px;position:relative;padding:20px 8px 30px;border-bottom:2px solid var(--line)}
+    .grafico-linha svg{width:100%;height:100%}
+    .info-box{background:#f8fafc;border:1px solid var(--line);border-radius:var(--radius);padding:14px 18px;margin-bottom:16px;font-size:13px;color:var(--muted);line-height:1.6}
+    .info-box strong{color:var(--text)}
+    .info-box i{color:var(--primary);font-style:normal;font-weight:800}
+    .upload-zone{border:2px dashed var(--line);border-radius:var(--radius);padding:24px;text-align:center;cursor:pointer;transition:all .2s;background:#fafbfc}
+    .upload-zone:hover{border-color:var(--primary);background:#f0f7ff}
+    .upload-zone .icon{font-size:28px;margin-bottom:8px;color:var(--primary)}
+    .upload-zone p{margin:0;font-size:13px;font-weight:700;color:var(--muted)}
+    .upload-zone small{display:block;margin-top:4px;font-size:11px;color:var(--muted)}
+    .formas-pagamento{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .forma-tag{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;font-size:12px;font-weight:800;background:#f1f5f9;border:1px solid var(--line)}
+    .forma-tag.active{background:var(--primary-soft);color:var(--primary);border-color:var(--primary)}
+    .boleto-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:12px}
+    .boleto-card .icon{width:40px;height:40px;border-radius:10px;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center;font-size:18px;font-weight:800}
+    .boleto-card .info{flex:1}
+    .boleto-card .info h4{margin:0 0 2px;font-size:14px}
+    .boleto-card .info p{margin:0;font-size:12px;color:var(--muted);font-weight:700}
+    .boleto-card .actions{display:flex;gap:8px}
+    .cpr-garantia-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+    .cpr-garantia-card h4{margin:0 0 8px;font-size:14px}
+    .cpr-garantia-card p{margin:0 0 12px;font-size:12px;color:var(--muted);font-weight:700}
+    .cpr-garantia-card .file-info{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f8fafc;border-radius:8px;border:1px solid var(--line)}
+    .cpr-garantia-card .file-info .file-icon{font-size:20px}
+    .cpr-garantia-card .file-info .file-name{flex:1;font-size:13px;font-weight:700}
+    .cpr-garantia-card .file-info .file-size{font-size:11px;color:var(--muted);font-weight:800}
+    @media(max-width:1100px){.fin-grid-3{grid-template-columns:repeat(2,1fr)}.fin-grid-2{grid-template-columns:1fr}}
+    @media(max-width:760px){.fin-grid-3{grid-template-columns:1fr}.fin-grid-2{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-text">NEXT <span>agrolink</span></div>
+        <button class="icon-btn only-mobile" id="closeSidebar">×</button>
+      </div>
+      <div class="nav-scroll">
+        <p class="nav-title">Principal</p>
+        <button class="nav-item" onclick="location.href='index.html'">▣ Dashboard</button>
+        <p class="nav-title">Comercial</p>
+        <button class="nav-item" onclick="location.href='clientes.html'">👤 Clientes</button>
+        <button class="nav-item" onclick="location.href='pedidos.html'">▤ Pedidos</button>
+        <button class="nav-item" onclick="location.href='vendas.html'">R$ Vendas</button>
+        <button class="nav-item" onclick="location.href='comissoes.html'">% Comissões</button>
+        <p class="nav-title">Produtos</p>
+        <button class="nav-item" onclick="location.href='produtos.html'">✦ Lista de Produtos</button>
+        <button class="nav-item" onclick="location.href='cadastro-produto.html'">＋ Cadastro Produto</button>
+        <button class="nav-item" onclick="location.href='precos.html'">⌑ Categorias e Preços</button>
+        <p class="nav-title">Operação</p>
+        <button class="nav-item" onclick="location.href='estoque.html'">▥ Estoque</button>
+        <button class="nav-item" onclick="location.href='producao.html'">⚙ Produção</button>
+        <button class="nav-item" onclick="location.href='qualidade.html'">✓ Qualidade</button>
+        <button class="nav-item" onclick="location.href='logistica.html'">⇄ Logística</button>
+        <p class="nav-title">Gestão</p>
+        <button class="nav-item active" onclick="location.href='financeiro.html'">◈ Financeiro</button>
+        <button class="nav-item" onclick="location.href='relatorios.html'">▰ Relatórios / BI</button>
+        <button class="nav-item" onclick="location.href='auditoria.html'">🛡 Auditoria</button>
+        <button class="nav-item" onclick="location.href='configuracoes.html'">⚙ Configurações</button>
+      </div>
+      <div class="sidebar-footer">
+        <button class="footer-btn" onclick="location.href='configuracoes.html'">Editar Perfil</button>
+        <button class="footer-btn primary" onclick="showToast('Saída simulada. Em sistema real, encerraria a sessão.'); setTimeout(()=>location.href='index.html',1500)">Sair</button>
+      </div>
+    </aside>
+    <div class="overlay" id="overlay"></div>
+    <main class="main">
+      <header class="topbar">
+        <button class="hamburger" id="openSidebar">☰</button>
+        <div>
+          <strong id="breadcrumb">Next Agrolink / Financeiro</strong>
+          <small>Protótipo funcional </small>
+        </div>
+        <input id="globalSearch" class="search" placeholder="Pesquisar no sistema...">
+        <div class="user-pill"><span>Bruno Cavalcante</span><b>B</b></div>
+      </header>
+      <section class="content" id="content"></section>
+    </main>
+  </div>
+  <nav class="bottom-nav">
+    <button onclick="location.href='index.html'">▣<span>Início</span></button>
+    <button onclick="location.href='pedidos.html'">▤<span>Pedidos</span></button>
+    <button onclick="location.href='clientes.html'">👤<span>Clientes</span></button>
+    <button onclick="location.href='produtos.html'">✦<span>Produtos</span></button>
+    <button onclick="location.href='relatorios.html'">▰<span>BI</span></button>
+  </nav>
+  <div class="modal" id="modal">
+    <div class="modal-card">
+      <div class="modal-head"><h2 id="modalTitle">Modal</h2><button class="icon-btn" id="modalClose">×</button></div>
+      <div id="modalBody"></div>
+      <div class="modal-actions">
+        <button class="btn secondary" id="modalCancel">Cancelar</button>
+        <button class="btn primary" id="modalConfirm">Confirmar</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+const state = {
+  page: 'financeiro',
+  selectedProduct: null, selectedClient: null, selectedOrder: null,
+  dashboardMonths: ['Jun','Jul','Ago','Set','Out','Nov','Dez','Jan','Fev','Mar','Abr','Mai'],
+  dashboardSales: [27680,30000,26680,19680,7680,14680,17680,19680,37680,42680,35680,40680],
+  clientes: [
+    {id:1, nome:'DORNELLES REOLON', telefone:'67 99853-1578', documento:'39.597.359/0002-76', cidade:'Douradina', uf:'MS', area:'780 ha', fazenda:'Agua Fria', culturas:'Soja / Milho', potencial:'Alto', status:'Ativo'},
+    {id:2, nome:'DOUGLAS DE CARVALHO', telefone:'67 99785-1945', documento:'12.456.789/0001-55', cidade:'Rio Brilhante', uf:'MS', area:'1200 ha', fazenda:'Santa Luzia', culturas:'Soja', potencial:'Estrategico', status:'Ativo'},
+    {id:3, nome:'DUQUE BASSO', telefone:'67 99492-3451', documento:'48.229.100/0001-18', cidade:'Sidrolandia', uf:'MS', area:'2500 ha', fazenda:'Boa Vista', culturas:'Soja / Milho / Trigo', potencial:'Estrategico', status:'Ativo'},
+    {id:4, nome:'EBILTON DONATTO DOS SANTOS', telefone:'67 99853-5592', documento:'28.331.891/0001-20', cidade:'Ponta Pora', uf:'MS', area:'1650 ha', fazenda:'Sol Nascente', culturas:'Milho', potencial:'Alto', status:'Ativo'},
+    {id:5, nome:'EDEMAR COSTA CONTAR', telefone:'67 99332-6716', documento:'22.671.998/0001-03', cidade:'Sidrolandia', uf:'MS', area:'380 ha', fazenda:'Sao Bento', culturas:'Pecuaria', potencial:'Medio', status:'Ativo'},
+    {id:6, nome:'EDEMILSON LUIZ VIEIRA', telefone:'67 99598-1578', documento:'91.119.780/0001-88', cidade:'Laguna Carapa', uf:'MS', area:'600 ha', fazenda:'Santa Maria', culturas:'Soja', potencial:'Alto', status:'Ativo'}
+  ],
+  produtos: [
+    {id:1, nome:'Powerful - Macrofitotonico', sku:'POWER-MACRO', embalagem:'Saco 25kg', unidade:'Kg', natureza:'Farelado', categoria:'Fertilizante', estoque:1480, reservado:260, lote:'PF-2601', validade:'30/11/2026', status:'Liberado', preco:3800, comissao:7.55},
+    {id:2, nome:'Patriot - Complexo Nutricional Sistemico', sku:'PATRIOT-NUTRI', embalagem:'Saco 25kg', unidade:'Kg', natureza:'Farelado', categoria:'Fertilizante', estoque:820, reservado:170, lote:'PT-2602', validade:'15/12/2026', status:'Liberado', preco:3950, comissao:7.55},
+    {id:3, nome:'Marvin Complexo - Ativador', sku:'MARVIN-ATIV', embalagem:'Saco 25kg', unidade:'Kg', natureza:'Farelado', categoria:'Bioinsumo', estoque:560, reservado:80, lote:'MC-2601', validade:'22/10/2026', status:'Liberado', preco:3600, comissao:6.8},
+    {id:4, nome:'Magnetto - Complexo Nitropotassico', sku:'MAG-NITRO', embalagem:'Saco 25kg', unidade:'Kg', natureza:'Farelado', categoria:'Fertilizante', estoque:1200, reservado:340, lote:'MG-2604', validade:'01/02/2027', status:'Liberado', preco:4100, comissao:8.0},
+    {id:5, nome:'Shellt MV - Adjuvante Completo', sku:'SHELLT-MV', embalagem:'Saco 25kg', unidade:'Kg', natureza:'Farelado', categoria:'Adjuvante', estoque:290, reservado:90, lote:'SH-2603', validade:'09/09/2026', status:'Atencao', preco:2200, comissao:5.5},
+    {id:6, nome:'Haxor Orange - Oleo de Laranja', sku:'HAXOR-ORANGE', embalagem:'Saco 25kg', unidade:'Kg', natureza:'Farelado', categoria:'Adjuvante', estoque:410, reservado:60, lote:'HO-2601', validade:'18/01/2027', status:'Liberado', preco:2500, comissao:5.8}
+  ],
+  pedidos: [
+    {id:'000126', data:'12/06/2025', cliente:'DORNELLES REOLON', representante:'Bruno Cavalcante', cidade:'Douradina/MS', valor:36475.84, status:'Em analise', vencimento:'30/03/2027', pago:0},
+    {id:'000178', data:'03/07/2025', cliente:'DOUGLAS DE CARVALHO', representante:'Ana Pereira', cidade:'Rio Brilhante/MS', valor:68768.65, status:'Faturado', vencimento:'30/03/2027', pago:0},
+    {id:'000251', data:'26/08/2025', cliente:'DUQUE BASSO', representante:'Carlos Lima', cidade:'Sidrolandia/MS', valor:121769.18, status:'Autorizado', vencimento:'30/03/2027', pago:0},
+    {id:'000363', data:'12/06/2025', cliente:'EBILTON DONATTO DOS SANTOS', representante:'Bruno Cavalcante', cidade:'Ponta Pora/MS', valor:47352.97, status:'Entregue', vencimento:'30/03/2027', pago:47352.97},
+    {id:'000149', data:'04/05/2026', cliente:'DORNELLES REOLON', representante:'Bruno Cavalcante', cidade:'Rio Verde/GO', valor:18886.25, status:'Entregue', vencimento:'30/03/2027', pago:18886.25},
+    {id:'000412', data:'15/07/2025', cliente:'DOUGLAS DE CARVALHO', representante:'Ana Pereira', cidade:'Rio Brilhante/MS', valor:52340.50, status:'Faturado', vencimento:'15/04/2027', pago:15000.00},
+    {id:'000589', data:'22/09/2025', cliente:'DUQUE BASSO', representante:'Carlos Lima', cidade:'Sidrolandia/MS', valor:89450.00, status:'Entregue', vencimento:'30/03/2027', pago:89450.00},
+    {id:'000601', data:'10/10/2025', cliente:'EDEMAR COSTA CONTAR', representante:'Bruno Cavalcante', cidade:'Sidrolandia/MS', valor:28450.00, status:'Faturado', vencimento:'30/04/2027', pago:0},
+    {id:'000702', data:'05/11/2025', cliente:'EDEMILSON LUIZ VIEIRA', representante:'Ana Pereira', cidade:'Laguna Carapa/MS', valor:45680.00, status:'Entregue', vencimento:'30/03/2027', pago:20000.00},
+    {id:'000815', data:'18/12/2025', cliente:'EBILTON DONATTO DOS SANTOS', representante:'Bruno Cavalcante', cidade:'Ponta Pora/MS', valor:67230.00, status:'Faturado', vencimento:'30/05/2027', pago:0}
+  ],
+  representantes: [
+    {id:1, nome:'Bruno Cavalcante', regiao:'MS Sul', meta:250000, vendido:210000, carteira:58, comissao:15855, status:'Ativo'},
+    {id:2, nome:'Ana Pereira', regiao:'GO', meta:200000, vendido:172000, carteira:42, comissao:12986, status:'Ativo'},
+    {id:3, nome:'Carlos Lima', regiao:'MT', meta:180000, vendido:145000, carteira:37, comissao:10947, status:'Meta parcial'}
+  ],
+  financeiro: {
+    contasReceber: [
+      {id:'REC-001', pedido:'000126', cliente:'DORNELLES REOLON', valorVenda:36475.84, valorRecebido:0, dataPrevista:'30/03/2027', dataRecebida:'', formaPagamento:'Barter (Troca por Grao)', status:'Em aberto', parcela:'1/1'},
+      {id:'REC-002', pedido:'000178', cliente:'DOUGLAS DE CARVALHO', valorVenda:68768.65, valorRecebido:0, dataPrevista:'30/03/2027', dataRecebida:'', formaPagamento:'Boleto 30/60/90 dias', status:'Em aberto', parcela:'1/3'},
+      {id:'REC-003', pedido:'000363', cliente:'EBILTON DONATTO DOS SANTOS', valorVenda:47352.97, valorRecebido:47352.97, dataPrevista:'30/03/2027', dataRecebida:'15/03/2027', formaPagamento:'PIX', status:'Recebido', parcela:'1/1'},
+      {id:'REC-004', pedido:'000149', cliente:'DORNELLES REOLON', valorVenda:18886.25, valorRecebido:18886.25, dataPrevista:'30/03/2027', dataRecebida:'28/03/2027', formaPagamento:'Barter (Troca por Grao)', status:'Recebido', parcela:'1/1'},
+      {id:'REC-005', pedido:'000412', cliente:'DOUGLAS DE CARVALHO', valorVenda:52340.50, valorRecebido:15000.00, dataPrevista:'15/04/2027', dataRecebida:'10/04/2027', formaPagamento:'Boleto 30/60/90 dias', status:'Parcial', parcela:'1/3'},
+      {id:'REC-006', pedido:'000589', cliente:'DUQUE BASSO', valorVenda:89450.00, valorRecebido:89450.00, dataPrevista:'30/03/2027', dataRecebida:'25/03/2027', formaPagamento:'Barter (Troca por Grao)', status:'Recebido', parcela:'1/1'},
+      {id:'REC-007', pedido:'000601', cliente:'EDEMAR COSTA CONTAR', valorVenda:28450.00, valorRecebido:0, dataPrevista:'30/04/2027', dataRecebida:'', formaPagamento:'Transferencia Bancaria 30/60 dias', status:'Em aberto', parcela:'1/2'},
+      {id:'REC-008', pedido:'000702', cliente:'EDEMILSON LUIZ VIEIRA', valorVenda:45680.00, valorRecebido:20000.00, dataPrevista:'30/03/2027', dataRecebida:'', formaPagamento:'Boleto 30/60/90 dias', status:'Parcial', parcela:'2/3'},
+      {id:'REC-009', pedido:'000815', cliente:'EBILTON DONATTO DOS SANTOS', valorVenda:67230.00, valorRecebido:0, dataPrevista:'30/05/2027', dataRecebida:'', formaPagamento:'Barter (Troca por Grao)', status:'Vencido', parcela:'1/1'},
+      {id:'REC-010', pedido:'000251', cliente:'DUQUE BASSO', valorVenda:121769.18, valorRecebido:0, dataPrevista:'30/03/2027', dataRecebida:'', formaPagamento:'Boleto 30/60/90/120 dias', status:'Em aberto', parcela:'1/4'}
+    ],
+    comissoesPagar: [
+      {id:'COM-001', representante:'Bruno Cavalcante', pedido:'000126', cliente:'DORNELLES REOLON', valorVenda:36475.84, percentual:7.55, valorComissao:2753.93, dataVencimento:'30/04/2027', dataPagamento:'', status:'A pagar'},
+      {id:'COM-002', representante:'Ana Pereira', pedido:'000178', cliente:'DOUGLAS DE CARVALHO', valorVenda:68768.65, percentual:7.55, valorComissao:5192.03, dataVencimento:'30/04/2027', dataPagamento:'', status:'A pagar'},
+      {id:'COM-003', representante:'Bruno Cavalcante', pedido:'000363', cliente:'EBILTON DONATTO DOS SANTOS', valorVenda:47352.97, percentual:7.55, valorComissao:3575.15, dataVencimento:'30/04/2027', dataPagamento:'15/04/2027', status:'Paga'},
+      {id:'COM-004', representante:'Bruno Cavalcante', pedido:'000149', cliente:'DORNELLES REOLON', valorVenda:18886.25, percentual:7.55, valorComissao:1425.91, dataVencimento:'30/04/2027', dataPagamento:'20/04/2027', status:'Paga'},
+      {id:'COM-005', representante:'Ana Pereira', pedido:'000412', cliente:'DOUGLAS DE CARVALHO', valorVenda:52340.50, percentual:7.55, valorComissao:3951.71, dataVencimento:'15/05/2027', dataPagamento:'', status:'A pagar'},
+      {id:'COM-006', representante:'Carlos Lima', pedido:'000589', cliente:'DUQUE BASSO', valorVenda:89450.00, percentual:6.80, valorComissao:6082.60, dataVencimento:'30/04/2027', dataPagamento:'25/04/2027', status:'Paga'},
+      {id:'COM-007', representante:'Bruno Cavalcante', pedido:'000601', cliente:'EDEMAR COSTA CONTAR', valorVenda:28450.00, percentual:7.55, valorComissao:2147.98, dataVencimento:'30/05/2027', dataPagamento:'', status:'A pagar'},
+      {id:'COM-008', representante:'Ana Pereira', pedido:'000702', cliente:'EDEMILSON LUIZ VIEIRA', valorVenda:45680.00, percentual:7.55, valorComissao:3448.84, dataVencimento:'30/04/2027', dataPagamento:'', status:'Atrasada'},
+      {id:'COM-009', representante:'Bruno Cavalcante', pedido:'000815', cliente:'EBILTON DONATTO DOS SANTOS', valorVenda:67230.00, percentual:7.55, valorComissao:5075.87, dataVencimento:'30/06/2027', dataPagamento:'', status:'A pagar'},
+      {id:'COM-010', representante:'Carlos Lima', pedido:'000251', cliente:'DUQUE BASSO', valorVenda:121769.18, percentual:6.80, valorComissao:8280.30, dataVencimento:'30/04/2027', dataPagamento:'', status:'A pagar'}
+    ],
+    barter: [
+      {id:'BAR-001', cliente:'DORNELLES REOLON', pedido:'000126', produto:'Soja', quantidade:292, precoSc:125.00, valorTotal:36475.84, entregaPrevista:'30/03/2027', entregaRealizada:'', status:'Pendente'},
+      {id:'BAR-002', cliente:'DORNELLES REOLON', pedido:'000149', produto:'Soja', quantidade:151, precoSc:125.00, valorTotal:18886.25, entregaPrevista:'30/03/2027', entregaRealizada:'28/03/2027', status:'Concluido'},
+      {id:'BAR-003', cliente:'DUQUE BASSO', pedido:'000589', produto:'Milho', quantidade:596, precoSc:150.00, valorTotal:89450.00, entregaPrevista:'30/03/2027', entregaRealizada:'25/03/2027', status:'Concluido'},
+      {id:'BAR-004', cliente:'EBILTON DONATTO DOS SANTOS', pedido:'000815', produto:'Soja', quantidade:538, precoSc:125.00, valorTotal:67230.00, entregaPrevista:'30/05/2027', entregaRealizada:'', status:'Atrasado'}
+    ],
+    cpr: [
+      {id:'CPR-001', cliente:'DOUGLAS DE CARVALHO', pedido:'000178', valor:68768.65, taxa:8.5, vencimento:'30/03/2027', banco:'Safra Agro', status:'Emitida', arquivoCPR:'cpr_douglas_000178.pdf', arquivoTamanho:'1.2 MB'},
+      {id:'CPR-002', cliente:'DUQUE BASSO', pedido:'000251', valor:121769.18, taxa:9.2, vencimento:'30/03/2027', banco:'Bradesco Rural', status:'Emitida', arquivoCPR:'cpr_duque_000251.pdf', arquivoTamanho:'1.5 MB'},
+      {id:'CPR-003', cliente:'EDEMILSON LUIZ VIEIRA', pedido:'000702', valor:25680.00, taxa:8.0, vencimento:'30/03/2027', banco:'Itau Agro', status:'Liquidada', arquivoCPR:'cpr_edemilson_000702.pdf', arquivoTamanho:'890 KB'}
+    ],
+    boletos: [
+      {id:'BOL-001', pedido:'000178', cliente:'DOUGLAS DE CARVALHO', valor:68768.65, vencimento:'30/03/2027', parcela:'1/3', status:'Em aberto', codigoBarras:'34191.79001 01043.510047 91020.150008 8 89250000068768'},
+      {id:'BOL-002', pedido:'000412', cliente:'DOUGLAS DE CARVALHO', valor:52340.50, vencimento:'15/04/2027', parcela:'1/3', status:'Parcial', codigoBarras:'34191.79001 01043.510047 91020.150008 8 89250000052340'},
+      {id:'BOL-003', pedido:'000251', cliente:'DUQUE BASSO', valor:121769.18, vencimento:'30/03/2027', parcela:'1/4', status:'Em aberto', codigoBarras:'34191.79001 01043.510047 91020.150008 8 89250000121769'},
+      {id:'BOL-004', pedido:'000702', cliente:'EDEMILSON LUIZ VIEIRA', valor:45680.00, vencimento:'30/03/2027', parcela:'2/3', status:'Parcial', codigoBarras:'34191.79001 01043.510047 91020.150008 8 89250000045680'}
+    ],
+    fluxoCaixa: [
+      {mes:'Jul/25', entrada:185000.00, saida:142000.00, saldo:43000.00},
+      {mes:'Ago/25', entrada:210000.00, saida:165000.00, saldo:45000.00},
+      {mes:'Set/25', entrada:195000.00, saida:178000.00, saldo:17000.00},
+      {mes:'Out/25', entrada:245000.00, saida:190000.00, saldo:55000.00},
+      {mes:'Nov/25', entrada:280000.00, saida:210000.00, saldo:70000.00},
+      {mes:'Dez/25', entrada:320000.00, saida:230000.00, saldo:90000.00}
+    ]
+  }
+};
+
+const BRL = v => Number(v || 0).toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+const cls = status => {
+  const s = String(status || '').toLowerCase();
+  if(s.includes('ativo') || s.includes('liberado') || s.includes('entregue') || s.includes('aprov') || s.includes('receb') || s.includes('pago') || s.includes('concluido') || s.includes('liquidada')) return 'ok';
+  if(s.includes('faturado') || s.includes('autorizado') || s.includes('em transporte') || s.includes('emitida')) return 'info';
+  if(s.includes('cancel') || s.includes('venc') || s.includes('bloque') || s.includes('reprov') || s.includes('atrasado')) return 'danger';
+  if(s.includes('parcial') || s.includes('pendente') || s.includes('em aberto') || s.includes('a vencer') || s.includes('a pagar')) return 'pending';
+  return 'pending';
+};
+const badge = s => `<span class="badge ${cls(s)}">${s}</span>`;
+const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+function showToast(msg){
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2400);
+}
+function modal(title, body, onConfirm, confirmText='Confirmar'){
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = body;
+  document.getElementById('modalConfirm').textContent = confirmText;
+  const m = document.getElementById('modal');
+  m.classList.add('open');
+  const confirm = document.getElementById('modalConfirm');
+  confirm.onclick = () => { if(onConfirm) onConfirm(); m.classList.remove('open'); };
+}
+function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+function pageHead(title, subtitle, actions=''){
+  return `<div class="page-head"><div><h1>${title}</h1><p class="subtitle">${subtitle}</p></div><div class="actions">${actions}</div></div>`;
+}
+function table(headers, rows, empty='Nenhum registro encontrado.'){
+  return `<div class="table-wrap"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.length?rows.join(''):`<tr><td colspan="${headers.length}" class="empty">${empty}</td></tr>`}</tbody></table></div>`;
+}
+function input(id,label,value='',extra=''){ return `<div class="field ${extra}"><label>${label}</label><input id="${id}" value="${esc(value)}"></div>`; }
+function select(id,label,options,value='',extra=''){ return `<div class="field ${extra}"><label>${label}</label><select id="${id}">${options.map(o=>`<option ${o==value?'selected':''}>${o}</option>`).join('')}</select></div>`; }
+function getFormData(ids){ const obj={}; ids.forEach(id=>{ const el=document.getElementById(id); obj[id]=el?el.value:''; }); return obj; }
+function exportar(nome){ showToast(`Exportacao de ${nome} simulada com sucesso`); }
+
+function finBadge(s){
+  const sl = String(s||'').toLowerCase();
+  if(sl.includes('recebido') || sl.includes('pago') || sl.includes('concluido') || sl.includes('liquidada')) return `<span class="badge ok">${s}</span>`;
+  if(sl.includes('parcial')) return `<span class="badge parcial">${s}</span>`;
+  if(sl.includes('vencido') || sl.includes('atrasado') || sl.includes('atrasada')) return `<span class="badge vencido">${s}</span>`;
+  if(sl.includes('em aberto') || sl.includes('pendente') || sl.includes('a vencer') || sl.includes('a pagar')) return `<span class="badge pending">${s}</span>`;
+  if(sl.includes('emitida')) return `<span class="badge info">${s}</span>`;
+  return `<span class="badge pending">${s}</span>`;
+}
+
+function statusPill(s){
+  const sl = String(s||'').toLowerCase();
+  if(sl.includes('paga')) return `<span class="status-pill ok"><span style="width:6px;height:6px;border-radius:50%;background:#15803d;display:inline-block"></span> ${s}</span>`;
+  if(sl.includes('atrasada')) return `<span class="status-pill danger"><span style="width:6px;height:6px;border-radius:50%;background:var(--red);display:inline-block"></span> ${s}</span>`;
+  return `<span class="status-pill pending"><span style="width:6px;height:6px;border-radius:50%;background:#a16207;display:inline-block"></span> ${s}</span>`;
+}
+
+function financeiro(){
+  const fin = state.financeiro;
+  const receber = fin.contasReceber;
+  const comissoes = fin.comissoesPagar;
+  const barter = fin.barter;
+  const cpr = fin.cpr;
+  const boletos = fin.boletos;
+  const fluxo = fin.fluxoCaixa;
+
+  const totalVendas = receber.reduce((a,b)=>a+b.valorVenda,0);
+  const totalRecebido = receber.reduce((a,b)=>a+b.valorRecebido,0);
+  const totalReceber = receber.reduce((a,b)=>a+(b.valorVenda-b.valorRecebido),0);
+  const totalVencido = receber.filter(r=>r.status==='Vencido').reduce((a,b)=>a+b.valorVenda,0);
+  const totalParcial = receber.filter(r=>r.status==='Parcial').reduce((a,b)=>a+(b.valorVenda-b.valorRecebido),0);
+  const totalEmAberto = receber.filter(r=>r.status==='Em aberto').reduce((a,b)=>a+b.valorVenda,0);
+  const totalComissoes = comissoes.reduce((a,b)=>a+b.valorComissao,0);
+  const totalComissoesPagas = comissoes.filter(c=>c.status==='Paga').reduce((a,b)=>a+b.valorComissao,0);
+  const totalComissoesPendentes = comissoes.filter(c=>c.status==='A pagar').reduce((a,b)=>a+b.valorComissao,0);
+  const totalComissoesAtrasadas = comissoes.filter(c=>c.status==='Atrasada').reduce((a,b)=>a+b.valorComissao,0);
+  const totalBarter = barter.reduce((a,b)=>a+b.valorTotal,0);
+  const totalCpr = cpr.reduce((a,b)=>a+b.valor,0);
+  const saldoCaixa = fluxo[fluxo.length-1].saldo;
+
+  const receberRows = receber.map(r=>{
+    const pct = r.valorVenda>0 ? Math.round(r.valorRecebido/r.valorVenda*100) : 0;
+    return `<tr><td><input type="checkbox"></td><td><b>${r.id}</b></td><td>${r.pedido}</td><td><div class="name-cell"><div class="avatar-mini">${r.cliente[0]}</div>${esc(r.cliente)}</div></td><td>${BRL(r.valorVenda)}</td><td>${BRL(r.valorRecebido)}</td><td><div class="progress-bar"><i style="width:${pct}%;background:${pct>=100?'var(--green)':pct>0?'var(--yellow)':'var(--line-dark)'};transition:width .4s"></i></div><small style="font-size:11px;font-weight:800;color:var(--muted)">${pct}%</small></td><td>${r.dataPrevista}</td><td>${r.dataRecebida||'—'}</td><td>${esc(r.formaPagamento)}</td><td>${finBadge(r.status)}</td><td><div class="table-actions"><button class="link-btn" onclick="receberConta('${r.id}')">Receber</button><button class="link-btn" onclick="verRecibo('${r.id}')">Recibo</button></div></td></tr>`;
+  });
+
+  const comissoesRows = comissoes.map(c=>`<tr><td><input type="checkbox"></td><td><b>${c.id}</b></td><td><div class="name-cell"><div class="avatar-mini">${c.representante[0]}</div>${esc(c.representante)}</div></td><td>${c.pedido}</td><td>${esc(c.cliente)}</td><td>${BRL(c.valorVenda)}</td><td>${c.percentual}%</td><td><strong style="color:var(--primary)">${BRL(c.valorComissao)}</strong></td><td>${c.dataVencimento}</td><td>${c.dataPagamento||'—'}</td><td>${statusPill(c.status)}</td><td><div class="table-actions"><button class="link-btn" onclick="pagarComissao('${c.id}')">Pagar</button><button class="link-btn" onclick="verExtratoComissao('${c.id}')">Extrato</button></div></td></tr>`);
+
+  const barterRows = barter.map(b=>`<tr><td><b>${b.id}</b></td><td>${esc(b.cliente)}</td><td>${b.pedido}</td><td>${b.produto}</td><td>${b.quantidade} Sc</td><td>${BRL(b.precoSc)}/Sc</td><td>${BRL(b.valorTotal)}</td><td>${b.entregaPrevista}</td><td>${b.entregaRealizada||'—'}</td><td>${finBadge(b.status)}</td><td><div class="table-actions"><button class="link-btn" onclick="verContratoBarter('${b.id}')">Contrato</button></div></td></tr>`);
+
+  const cprRows = cpr.map(c=>`<tr><td><b>${c.id}</b></td><td>${esc(c.cliente)}</td><td>${c.pedido}</td><td>${BRL(c.valor)}</td><td>${c.taxa}% a.a.</td><td>${c.vencimento}</td><td>${esc(c.banco)}</td><td>${finBadge(c.status)}</td><td><div class="table-actions"><button class="link-btn" onclick="verCpr('${c.id}')">Visualizar</button><button class="link-btn" onclick="anexarCpr('${c.id}')">Anexar PDF</button></div></td></tr>`);
+
+  const boletoRows = boletos.map(b=>`<tr><td><b>${b.id}</b></td><td>${b.pedido}</td><td>${esc(b.cliente)}</td><td>${BRL(b.valor)}</td><td>${b.vencimento}</td><td>${b.parcela}</td><td>${finBadge(b.status)}</td><td><div class="table-actions"><button class="link-btn" onclick="downloadBoleto('${b.id}')">Baixar Boleto</button><button class="link-btn" onclick="copiarCodigo('${b.id}')">Copiar Codigo</button></div></td></tr>`);
+
+  const fluxoRows = fluxo.map(f=>`<tr><td><b>${f.mes}</b></td><td style="color:#15803d;font-weight:800">${BRL(f.entrada)}</td><td style="color:var(--red);font-weight:800">${BRL(f.saida)}</td><td style="font-weight:800;color:${f.saldo>=0?'#15803d':'var(--red)'}">${BRL(f.saldo)}</td></tr>`);
+
+  const inadimplentes = receber.filter(r=>r.status==='Vencido' || r.status==='Parcial');
+  const inadimplentesHtml = inadimplentes.length ? inadimplentes.map(r=>{
+    const restante = r.valorVenda - r.valorRecebido;
+    return `<div class="card panel fin-card-highlight ${r.status==='Vencido'?'red':'yellow'}"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div><h3 style="margin:0 0 6px;font-size:16px">${esc(r.cliente)}</h3><p style="margin:0;color:var(--muted);font-size:13px">Pedido ${r.pedido} - ${esc(r.formaPagamento)}</p></div><div style="text-align:right"><strong style="font-size:20px;color:var(--primary)">${BRL(restante)}</strong><div style="font-size:12px;color:var(--muted);font-weight:800;margin-top:2px">${r.status}</div></div></div><div class="fin-row-detail"><div><label>Valor da venda</label><span>${BRL(r.valorVenda)}</span></div><div><label>Recebido</label><span>${BRL(r.valorRecebido)}</span></div><div><label>Vencimento</label><span>${r.dataPrevista}</span></div><div><label>Dias em atraso</label><span style="color:var(--red)">15 dias</span></div></div></div>`;
+  }).join('') : '<p style="color:var(--muted);text-align:center;padding:20px">Nenhuma inadimplencia registrada.</p>';
+
+  const maxFluxo = Math.max(...fluxo.map(f=>Math.max(f.entrada, f.saida)));
+  const chartHtml = fluxo.map((f,i)=>{
+    const hE = Math.max(14, (f.entrada/maxFluxo)*160);
+    const hS = Math.max(14, (f.saida/maxFluxo)*160);
+    return `<div class="chart-col"><span class="val" style="color:#15803d">${(f.entrada/1000).toFixed(0)}k</span><div class="chart-bars"><div class="chart-bar entrada" style="height:${hE}px"></div><div class="chart-bar saida" style="height:${hS}px"></div></div><label>${f.mes}</label></div>`;
+  }).join('');
+
+  const pctRecebido = Math.round(totalRecebido/totalVendas*345);
+  const pctParcial = Math.round(totalParcial/totalVendas*345);
+  const pctVencido = Math.round(totalVencido/totalVendas*345);
+  const offsetParcial = -pctRecebido;
+  const offsetVencido = -(pctRecebido + pctParcial);
+
+  return pageHead('Financeiro', 'Gestao financeira completa: contas a receber, comissoes, barter, CPR, fluxo de caixa e inadimplencia.',
+    `<button class="btn secondary" onclick="exportar('financeiro')">Exportar Relatorio</button><button class="btn primary" onclick="novaReceita()">+ Nova Receita</button>`) +
+
+  `<div class="fin-grid-3">` +
+    `<div class="card kpi fin-kpi-big"><div class="kpi-icon p">R$</div><div><span>Total a Receber</span><strong>${BRL(totalReceber)}</strong><div class="trend ${totalReceber>0?'down':'up'}">${receber.filter(r=>r.status==='Em aberto').length} titulos em aberto</div></div></div>` +
+    `<div class="card kpi fin-kpi-big"><div class="kpi-icon g">✓</div><div><span>Total Recebido</span><strong>${BRL(totalRecebido)}</strong><div class="trend up">${Math.round(totalRecebido/totalVendas*100)}% da carteira</div></div></div>` +
+    `<div class="card kpi fin-kpi-big"><div class="kpi-icon r">!</div><div><span>Inadimplencia</span><strong>${BRL(totalVencido + totalParcial)}</strong><div class="trend down">${inadimplentes.length} cliente(s) em atraso</div></div></div>` +
+  `</div>` +
+
+  `<div class="fin-grid-3">` +
+    `<div class="card kpi fin-kpi-big"><div class="kpi-icon b">⇄</div><div><span>Saldo Caixa</span><strong>${BRL(saldoCaixa)}</strong><div class="trend up">Projecao 6 meses</div></div></div>` +
+    `<div class="card kpi fin-kpi-big"><div class="kpi-icon y">%</div><div><span>Comissoes a Pagar</span><strong>${BRL(totalComissoesPendentes + totalComissoesAtrasadas)}</strong><div class="trend ${totalComissoesAtrasadas>0?'down':'up'}">${comissoes.filter(c=>c.status==='Atrasada').length} atrasada(s)</div></div></div>` +
+    `<div class="card kpi fin-kpi-big"><div class="kpi-icon p">🌾</div><div><span>Barter / CPR</span><strong>${BRL(totalBarter + totalCpr)}</strong><div class="trend">${barter.length} barter - ${cpr.length} CPR</div></div></div>` +
+  `</div>` +
+
+  `<div class="grid-2">` +
+    `<div class="card panel"><div class="panel-title"><h2>Fluxo de Caixa</h2><span>Entradas × Saidas (6 meses)</span></div>` +
+    `<div class="chart-area">${chartHtml}</div>` +
+    `<div class="chart-legend"><span><span class="dot" style="background:var(--green)"></span> Entradas</span><span><span class="dot" style="background:var(--red);opacity:.7"></span> Saidas</span></div>` +
+    `</div>` +
+    `<div class="card panel"><div class="panel-title"><h2>Carteira de Recebimentos</h2><span>Distribuicao por status</span></div>` +
+    `<div style="display:flex;align-items:center;gap:20px;padding:10px 0">` +
+      `<div class="doughnut-wrap">` +
+        `<svg viewBox="0 0 140 140" width="130" height="130">` +
+          `<circle cx="70" cy="70" r="52" fill="none" stroke="#e2e8f0" stroke-width="16"/>` +
+          `<circle cx="70" cy="70" r="52" fill="none" stroke="#22c55e" stroke-width="16" stroke-dasharray="${pctRecebido} ${345-pctRecebido}" stroke-linecap="round"/>` +
+          `<circle cx="70" cy="70" r="52" fill="none" stroke="#f59e0b" stroke-width="16" stroke-dasharray="${pctParcial} ${345-pctParcial}" stroke-dashoffset="${offsetParcial}" stroke-linecap="round"/>` +
+          `<circle cx="70" cy="70" r="52" fill="none" stroke="#ef4444" stroke-width="16" stroke-dasharray="${pctVencido} ${345-pctVencido}" stroke-dashoffset="${offsetVencido}" stroke-linecap="round"/>` +
+        `</svg>` +
+        `<div class="doughnut-center"><strong>${BRL(totalVendas)}</strong><span>Carteira</span></div>` +
+      `</div>` +
+      `<div class="legend-grid" style="flex:1">` +
+        `<div class="legend-row"><span class="legend-dot" style="background:var(--green)"></span><span>Recebido</span><strong>${BRL(totalRecebido)}</strong></div>` +
+        `<div class="legend-row"><span class="legend-dot" style="background:var(--yellow)"></span><span>Parcial</span><strong>${BRL(totalParcial)}</strong></div>` +
+        `<div class="legend-row"><span class="legend-dot" style="background:var(--red)"></span><span>Vencido</span><strong>${BRL(totalVencido)}</strong></div>` +
+        `<div class="legend-row"><span class="legend-dot" style="background:var(--line-dark)"></span><span>Em aberto</span><strong>${BRL(totalEmAberto)}</strong></div>` +
+      `</div>` +
+    `</div></div>` +
+  `</div>` +
+
+  `<div class="fin-section-title"><h2>💳 Formas de Pagamento</h2><span>Boleto · PIX · Transferencia · Barter</span></div>` +
+  `<div class="info-box">` +
+    `<strong>Como funciona?</strong> A industria oferece multiplas formas de pagamento ao produtor. O <i>Boleto</i> e emitido junto com a nota fiscal e pode ser baixado pelo produtor na plataforma. O <i>PIX</i> e <i>Transferencia Bancaria</i> sao pagamentos a vista. O <i>Barter</i> e uma troca por grao — o produtor fica devendo em soja, milho ou outro grao acordado, em vez de pagar em dinheiro.` +
+  `</div>` +
+  `<div class="card panel"><div class="panel-title"><h2>📄 Boletos Emitidos</h2><span>${boletos.length} boletos · Download disponivel para o produtor</span></div>` +
+  `<div class="card panel">${table(['Boleto','Pedido','Cliente','Valor','Vencimento','Parcela','Status','Acoes'], boletoRows)}</div>` +
+  `</div>` +
+
+  `<div class="fin-section-title"><h2>📥 Contas a Receber</h2><span>${receber.length} titulos · ${BRL(totalReceber)} em aberto</span></div>` +
+  `<div class="fin-actions">` +
+    `<button class="btn secondary" onclick="filtrarReceber('todos')">Todos</button>` +
+    `<button class="btn secondary" onclick="filtrarReceber('Em aberto')">Em Aberto</button>` +
+    `<button class="btn secondary" onclick="filtrarReceber('Parcial')">Parcial</button>` +
+    `<button class="btn secondary" onclick="filtrarReceber('Recebido')">Recebido</button>` +
+    `<button class="btn secondary" onclick="filtrarReceber('Vencido')">Vencido</button>` +
+    `<button class="btn primary" onclick="receberSelecionados()" style="margin-left:auto">Receber Selecionados</button>` +
+  `</div>` +
+  `<div class="card panel">${table(['','Titulo','Pedido','Cliente','Valor da Venda','Valor Recebido','Progresso','Data Prevista','Data Recebida','Forma de Pagamento','Status','Acoes'], receberRows)}</div>` +
+
+  `<div class="fin-section-title"><h2>% Comissoes a Pagar</h2><span>${comissoes.length} titulos · ${BRL(totalComissoesPendentes + totalComissoesAtrasadas)} pendente</span></div>` +
+  `<div class="fin-actions">` +
+    `<button class="btn secondary" onclick="filtrarComissoes('todos')">Todos</button>` +
+    `<button class="btn secondary" onclick="filtrarComissoes('A pagar')">A Pagar</button>` +
+    `<button class="btn secondary" onclick="filtrarComissoes('Paga')">Pagas</button>` +
+    `<button class="btn secondary" onclick="filtrarComissoes('Atrasada')">Atrasadas</button>` +
+    `<button class="btn primary" onclick="pagarComissoesSelecionadas()" style="margin-left:auto">Pagar Selecionadas</button>` +
+  `</div>` +
+  `<div class="card panel">${table(['','Titulo','Representante','Pedido','Cliente','Valor Venda','%','Valor Comissao','Vencimento','Pagamento','Status','Acoes'], comissoesRows)}</div>` +
+
+  `<div class="fin-section-title"><h2>🌾 Barter — Forma de Pagamento (Troca por Grao)</h2><span>${barter.length} contratos · ${BRL(totalBarter)}</span></div>` +
+  `<div class="info-box">` +
+    `<strong>O que e Barter?</strong> O Barter e uma <i>forma de pagamento</i> oferecida pela industria. Em vez de pagar em dinheiro (boleto, PIX ou transferencia), o produtor fica devendo em grao (soja, milho, etc.). A entrega do grao liquida o debito da compra realizada. E uma alternativa ao pagamento convencional, nao uma garantia.` +
+  `</div>` +
+  `<div class="card panel">${table(['Contrato','Cliente','Pedido','Produto','Quantidade','Preco/Sc','Valor Total','Entrega Prevista','Entrega Realizada','Status','Acoes'], barterRows)}</div>` +
+
+  `<div class="fin-section-title"><h2>📜 CPR — Cedula de Produto Rural (Garantia)</h2><span>${cpr.length} titulos · ${BRL(totalCpr)}</span></div>` +
+  `<div class="info-box">` +
+    `<strong>O que e CPR?</strong> A CPR e uma <i>garantia</i> emitida pelo agricultor para garantir uma compra. E um documento assinado pelo produtor (em PDF) que serve de garantia na hora de avaliar credito. O produtor faz o upload do arquivo PDF assinado para a empresa, que o utiliza como garantia da compra realizada. <i>Diferente do Barter, a CPR nao e forma de pagamento — e garantia.</i>` +
+  `</div>` +
+  `<div class="card panel">${table(['CPR','Cliente','Pedido','Valor','Taxa','Vencimento','Banco','Status','Acoes'], cprRows)}</div>` +
+
+  `<div class="fin-section-title"><h2>💰 Fluxo de Caixa Detalhado</h2><span>Ultimos 6 meses</span></div>` +
+  `<div class="card panel">${table(['Mes','Entradas','Saidas','Saldo'], fluxoRows)}</div>` +
+
+  `<div class="fin-section-title"><h2>⚠️ Inadimplencia e Atrasos</h2><span>${inadimplentes.length} cliente(s) com pendencia</span></div>` +
+  `<div class="grid-2">${inadimplentesHtml}</div>`;
+}
+
+function receberConta(id){
+  const rec = state.financeiro.contasReceber.find(r=>r.id===id);
+  if(!rec) return;
+  modal('Receber Conta', `<div class="form-grid">
+    ${input('rcliente','Cliente',rec.cliente)}
+    ${input('rvalor','Valor da Venda',BRL(rec.valorVenda))}
+    ${input('rrecebido','Valor Recebido',BRL(rec.valorRecebido))}
+    ${input('rreceber','Valor a Receber',BRL(rec.valorVenda-rec.valorRecebido))}
+    ${input('rdataprev','Data Prevista',rec.dataPrevista)}
+    ${input('rdatarec','Data Recebida',new Date().toLocaleDateString('pt-BR'))}
+    ${select('rforma','Forma de Pagamento',['Boleto','PIX','Transferencia Bancaria','Barter (Troca por Grao)','Cartao'],rec.formaPagamento.split(' ')[0])}
+    ${select('rstatus','Status',['Em aberto','Parcial','Recebido','Vencido'],rec.status)}
+  </div>`,()=>{
+    const d = getFormData(['rcliente','rvalor','rrecebido','rreceber','rdataprev','rdatarec','rforma','rstatus']);
+    rec.cliente = d.rcliente;
+    rec.dataRecebida = d.rdatarec;
+    rec.formaPagamento = d.rforma;
+    rec.status = d.rstatus;
+    render(); showToast(`Conta ${id} atualizada com sucesso`);
+  },'Salvar Recebimento');
+}
+
+function pagarComissao(id){
+  const com = state.financeiro.comissoesPagar.find(c=>c.id===id);
+  if(!com) return;
+  modal('Pagar Comissao', `<div class="form-grid">
+    ${input('crep','Representante',com.representante)}
+    ${input('cpedido','Pedido',com.pedido)}
+    ${input('ccliente','Cliente',com.cliente)}
+    ${input('cvalor','Valor da Venda',BRL(com.valorVenda))}
+    ${input('cperc','Percentual',com.percentual+'%')}
+    ${input('ccomissao','Valor Comissao',BRL(com.valorComissao))}
+    ${input('cvenc','Vencimento',com.dataVencimento)}
+    ${input('cpag','Data Pagamento',new Date().toLocaleDateString('pt-BR'))}
+    ${select('cstatus','Status',['A pagar','Paga','Atrasada'],com.status)}
+  </div>`,()=>{
+    const d = getFormData(['crep','cpedido','ccliente','cvalor','cperc','ccomissao','cvenc','cpag','cstatus']);
+    com.dataPagamento = d.cpag;
+    com.status = d.cstatus;
+    render(); showToast(`Comissao ${id} paga com sucesso`);
+  },'Confirmar Pagamento');
+}
+
+function verRecibo(id){ showToast(`Recibo ${id} gerado (simulacao)`); }
+function verExtratoComissao(id){ showToast(`Extrato de comissao ${id} gerado (simulacao)`); }
+function verContratoBarter(id){ showToast(`Contrato Barter ${id} aberto (simulacao)`); }
+function verCpr(id){ 
+  const cpr = state.financeiro.cpr.find(c=>c.id===id);
+  if(!cpr) return;
+  modal('Visualizar CPR - Cedula de Produto Rural', `
+    <div style="margin-bottom:16px">
+      <p style="font-size:13px;color:var(--muted);margin:0 0 12px">A CPR e uma garantia emitida pelo agricultor. Abaixo estao os detalhes da CPR e o documento PDF assinado pelo produtor.</p>
+      <div class="form-grid">
+        ${input('vcpr','CPR',cpr.id)}
+        ${input('vcliente','Cliente',cpr.cliente)}
+        ${input('vpedido','Pedido',cpr.pedido)}
+        ${input('vvalor','Valor',BRL(cpr.valor))}
+        ${input('vtaxa','Taxa',cpr.taxa+'% a.a.')}
+        ${input('vvenc','Vencimento',cpr.vencimento)}
+        ${input('vbanco','Banco',cpr.banco)}
+        ${input('vstatus','Status',cpr.status)}
+      </div>
+    </div>
+    <div class="cpr-garantia-card">
+      <h4>📎 Documento de Garantia (PDF assinado pelo produtor)</h4>
+      <p>Arquivo enviado pelo agricultor como garantia da compra</p>
+      <div class="file-info">
+        <span class="file-icon">📄</span>
+        <span class="file-name">${cpr.arquivoCPR}</span>
+        <span class="file-size">${cpr.arquivoTamanho}</span>
+        <button class="btn primary" style="font-size:12px;padding:4px 12px" onclick="downloadCpr('${cpr.id}')">Baixar PDF</button>
+      </div>
+    </div>
+  `, null, 'Fechar');
+}
+
+function anexarCpr(id){
+  const cpr = state.financeiro.cpr.find(c=>c.id===id);
+  if(!cpr) return;
+  modal('Anexar CPR - Documento de Garantia', `
+    <div style="margin-bottom:16px">
+      <p style="font-size:13px;color:var(--muted);margin:0 0 12px">A CPR e uma garantia emitida pelo agricultor. Faca o upload do arquivo PDF assinado pelo produtor para vincular como garantia da compra.</p>
+      <div class="form-grid">
+        ${input('acpr','CPR',cpr.id)}
+        ${input('acliente','Cliente',cpr.cliente)}
+        ${input('apedido','Pedido',cpr.pedido)}
+      </div>
+    </div>
+    <div class="upload-zone" onclick="showToast('Selecao de arquivo simulada')">
+      <div class="icon">📤</div>
+      <p>Clique para fazer upload do PDF da CPR</p>
+      <small>Formato aceito: PDF assinado pelo agricultor · Max. 10 MB</small>
+    </div>
+    <div style="margin-top:12px;padding:10px 12px;background:#f0fdf4;border-radius:8px;border:1px solid #bbf7d0">
+      <p style="margin:0;font-size:12px;color:#15803d;font-weight:700">✓ O arquivo sera vinculado como garantia da compra realizada</p>
+    </div>
+  `,()=>{
+    cpr.arquivoCPR = 'cpr_' + cpr.cliente.toLowerCase().replace(/\s+/g,'_') + '_' + cpr.pedido + '.pdf';
+    cpr.arquivoTamanho = '2.1 MB';
+    render(); showToast(`CPR ${id} - PDF anexado com sucesso`);
+  },'Anexar Documento');
+}
+
+function downloadCpr(id){ showToast(`Download do PDF da CPR ${id} iniciado (simulacao)`); }
+function downloadBoleto(id){ showToast(`Boleto ${id} baixado com sucesso (simulacao)`); }
+function copiarCodigo(id){ 
+  const bol = state.financeiro.boletos.find(b=>b.id===id);
+  if(bol){
+    navigator.clipboard?.writeText(bol.codigoBarras);
+    showToast(`Codigo de barras copiado: ${bol.codigoBarras.substring(0,20)}...`);
+  }
+}
+function novaReceita(){ showToast('Nova receita criada no prototipo'); }
+function receberSelecionados(){ showToast('Recebimentos em massa processados'); }
+function pagarComissoesSelecionadas(){ showToast('Comissoes pagas em massa'); }
+
+function filtrarReceber(filtro){
+  const term = filtro==='todos'?'':filtro;
+  const tbody = document.querySelector('.table-wrap tbody');
+  if(!tbody) return;
+  const rows = state.financeiro.contasReceber;
+  const filtered = term?rows.filter(r=>r.status===term):rows;
+  tbody.innerHTML = filtered.map(r=>{
+    const pct = r.valorVenda>0 ? Math.round(r.valorRecebido/r.valorVenda*100) : 0;
+    return `<tr><td><input type="checkbox"></td><td><b>${r.id}</b></td><td>${r.pedido}</td><td><div class="name-cell"><div class="avatar-mini">${r.cliente[0]}</div>${esc(r.cliente)}</div></td><td>${BRL(r.valorVenda)}</td><td>${BRL(r.valorRecebido)}</td><td><div class="progress-bar"><i style="width:${pct}%;background:${pct>=100?'var(--green)':pct>0?'var(--yellow)':'var(--line-dark)'};transition:width .4s"></i></div><small style="font-size:11px;font-weight:800;color:var(--muted)">${pct}%</small></td><td>${r.dataPrevista}</td><td>${r.dataRecebida||'—'}</td><td>${esc(r.formaPagamento)}</td><td>${finBadge(r.status)}</td><td><div class="table-actions"><button class="link-btn" onclick="receberConta('${r.id}')">Receber</button><button class="link-btn" onclick="verRecibo('${r.id}')">Recibo</button></div></td></tr>`;
+  }).join('');
+  if(!filtered.length) tbody.innerHTML = `<tr><td colspan="12" class="empty">Nenhum registro encontrado.</td></tr>`;
+}
+
+function filtrarComissoes(filtro){
+  const term = filtro==='todos'?'':filtro;
+  const tbodies = document.querySelectorAll('.table-wrap tbody');
+  const tbody = tbodies[1];
+  if(!tbody) return;
+  const rows = state.financeiro.comissoesPagar;
+  const filtered = term?rows.filter(r=>r.status===term):rows;
+  tbody.innerHTML = filtered.map(c=>`<tr><td><input type="checkbox"></td><td><b>${c.id}</b></td><td><div class="name-cell"><div class="avatar-mini">${c.representante[0]}</div>${esc(c.representante)}</div></td><td>${c.pedido}</td><td>${esc(c.cliente)}</td><td>${BRL(c.valorVenda)}</td><td>${c.percentual}%</td><td><strong style="color:var(--primary)">${BRL(c.valorComissao)}</strong></td><td>${c.dataVencimento}</td><td>${c.dataPagamento||'—'}</td><td>${statusPill(c.status)}</td><td><div class="table-actions"><button class="link-btn" onclick="pagarComissao('${c.id}')">Pagar</button><button class="link-btn" onclick="verExtratoComissao('${c.id}')">Extrato</button></div></td></tr>`).join('');
+  if(!filtered.length) tbody.innerHTML = `<tr><td colspan="12" class="empty">Nenhum registro encontrado.</td></tr>`;
+}
+
+function render(){
+  const content = document.getElementById('content');
+  content.innerHTML = financeiro();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('openSidebar').onclick = () => {document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('open');};
+  document.getElementById('closeSidebar').onclick = () => {document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open');};
+  document.getElementById('overlay').onclick = () => {document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open');};
+  document.getElementById('modalClose').onclick = closeModal;
+  document.getElementById('modalCancel').onclick = closeModal;
+  render();
+});
+  </script>
+</body>
+</html>
