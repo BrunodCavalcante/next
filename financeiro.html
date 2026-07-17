@@ -6,95 +6,348 @@
   <title>Financeiro - Next Agrolink</title>
   <link rel="stylesheet" href="style.css">
   <style>
+    /* ================================================================
+       FINANCEIRO - SISTEMA COMERCIAL GRADE
+       Next Agrolink v2.0 - Módulo Financeiro
+       ================================================================ */
+
+    /* ---- Animações Globais ---- */
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes slideInRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+    @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+    @keyframes countUp{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+    @keyframes toastSlide{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+    @keyframes modalBackdrop{from{opacity:0}to{opacity:1}}
+    @keyframes modalCard{from{opacity:0;transform:scale(.95) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+
+    /* ---- Variáveis Financeiro ---- */
+    :root{
+      --fin-primary:#8b3f75;
+      --fin-primary-dark:#6b2c59;
+      --fin-primary-soft:#f7edf4;
+      --fin-bg:#f3f5f9;
+      --fin-card:#ffffff;
+      --fin-text:#0f172a;
+      --fin-muted:#64748b;
+      --fin-line:#e2e8f0;
+      --fin-line-dark:#cbd5e1;
+      --fin-green:#22c55e;
+      --fin-green-soft:#dcfce7;
+      --fin-green-dark:#15803d;
+      --fin-red:#ef4444;
+      --fin-red-soft:#fee2e2;
+      --fin-red-dark:#b91c1c;
+      --fin-blue:#2563eb;
+      --fin-blue-soft:#dbeafe;
+      --fin-yellow:#f59e0b;
+      --fin-yellow-soft:#fef3c7;
+      --fin-purple:#7c3aed;
+      --fin-purple-soft:#ede9fe;
+      --fin-orange:#f97316;
+      --fin-orange-soft:#ffedd5;
+      --fin-shadow:0 8px 28px rgba(15,23,42,.08);
+      --fin-shadow-lg:0 20px 60px rgba(15,23,42,.12);
+      --fin-shadow-hover:0 12px 40px rgba(15,23,42,.14);
+      --fin-radius:16px;
+      --fin-radius-sm:12px;
+      --fin-radius-xs:8px;
+      --fin-transition:all .25s cubic-bezier(.4,0,.2,1);
+      --fin-transition-fast:all .15s ease;
+    }
+
+    /* ---- Layout Financeiro ---- */
+    .fin-page{animation:fadeIn .5s ease}
     .fin-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
     .fin-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
-    .fin-kpi-big{padding:22px 20px}
-    .fin-kpi-big .kpi-icon{width:52px;height:52px;border-radius:14px;font-size:18px}
-    .fin-kpi-big strong{font-size:26px}
-    .fin-kpi-big .trend{font-size:12px;color:var(--muted);margin-top:4px;font-weight:700}
-    .fin-kpi-big .trend.up{color:#15803d}
-    .fin-kpi-big .trend.down{color:var(--red)}
-    .badge.parcial{background:#fef3c7;color:#a16207}
-    .badge.vencido{background:var(--red-soft);color:var(--red)}
-    .fin-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
-    .fin-actions .btn{min-height:36px;padding:0 14px;font-size:13px}
-    .fin-section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:32px 0 16px}
-    .fin-section-title h2{margin:0;font-size:18px}
-    .fin-section-title span{color:var(--muted);font-size:13px;font-weight:700}
-    .progress-bar{height:8px;background:#edf2f7;border-radius:99px;overflow:hidden;margin-top:6px}
-    .progress-bar i{display:block;height:100%;border-radius:99px}
-    .fin-card-highlight{border-left:4px solid var(--primary)}
-    .fin-card-highlight.red{border-left-color:var(--red)}
-    .fin-card-highlight.yellow{border-left-color:var(--yellow)}
-    .fin-card-highlight.green{border-left-color:var(--green)}
-    .fin-row-detail{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
-    .fin-row-detail div{text-align:center}
-    .fin-row-detail div label{display:block;font-size:11px;color:var(--muted);font-weight:800;margin-bottom:2px}
-    .fin-row-detail div span{font-size:14px;font-weight:800;color:var(--text)}
-    .chart-area{height:220px;position:relative;padding:16px 12px 32px;border-bottom:2px solid var(--line);display:flex;align-items:flex-end;gap:8px}
-    .chart-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px}
-    .chart-bars{display:flex;align-items:flex-end;gap:3px;width:100%;justify-content:center}
-    .chart-bar{width:18px;border-radius:4px 4px 0 0;transition:all .3s}
-    .chart-bar.entrada{background:var(--green)}
-    .chart-bar.saida{background:var(--red);opacity:.7}
-    .chart-col label{font-size:10px;color:var(--muted);font-weight:800;margin-top:4px}
-    .chart-col .val{font-size:9px;font-weight:800;color:var(--muted);white-space:nowrap}
-    .chart-legend{display:flex;gap:20px;justify-content:center;margin-top:12px;font-size:12px;font-weight:800}
-    .chart-legend span{display:flex;align-items:center;gap:6px}
-    .chart-legend .dot{width:10px;height:10px;border-radius:3px;display:inline-block}
-    .doughnut-wrap{width:130px;height:130px;position:relative;margin:auto;flex-shrink:0}
-    .doughnut-wrap svg{transform:rotate(-90deg)}
-    .doughnut-center{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
-    .doughnut-center strong{font-size:18px;color:var(--text)}
-    .doughnut-center span{font-size:10px;color:var(--muted);font-weight:800}
-    .legend-grid{display:grid;gap:10px}
-    .legend-row{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700}
-    .legend-dot{width:10px;height:10px;border-radius:3px}
-    .legend-row span{flex:1;color:var(--muted)}
-    .legend-row strong{color:var(--text);font-size:14px}
-    .comissao-card{background:white;border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);display:flex;align-items:center;gap:14px}
-    .comissao-card .avatar-mini{width:44px;height:44px;font-size:16px}
-    .comissao-card .info{flex:1}
-    .comissao-card .info h4{margin:0 0 4px;font-size:15px}
-    .comissao-card .info p{margin:0;color:var(--muted);font-size:12px;font-weight:700}
-    .comissao-card .valor{text-align:right}
-    .comissao-card .valor strong{font-size:18px;color:var(--primary)}
-    .comissao-card .valor span{font-size:11px;color:var(--muted);font-weight:800}
-    .mini-stat{display:flex;gap:16px;margin-top:8px}
-    .mini-stat div{font-size:12px;font-weight:800;color:var(--muted)}
-    .mini-stat div strong{color:var(--text);font-size:13px}
-    .status-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:900}
-    .status-pill.ok{background:var(--green-soft);color:#15803d}
-    .status-pill.pending{background:var(--yellow-soft);color:#a16207}
-    .status-pill.danger{background:var(--red-soft);color:var(--red)}
-    .grafico-linha{height:200px;position:relative;padding:20px 8px 30px;border-bottom:2px solid var(--line)}
-    .grafico-linha svg{width:100%;height:100%}
-    .info-box{background:#f8fafc;border:1px solid var(--line);border-radius:var(--radius);padding:14px 18px;margin-bottom:16px;font-size:13px;color:var(--muted);line-height:1.6}
-    .info-box strong{color:var(--text)}
-    .info-box i{color:var(--primary);font-style:normal;font-weight:800}
-    .upload-zone{border:2px dashed var(--line);border-radius:var(--radius);padding:24px;text-align:center;cursor:pointer;transition:all .2s;background:#fafbfc}
-    .upload-zone:hover{border-color:var(--primary);background:#f0f7ff}
-    .upload-zone .icon{font-size:28px;margin-bottom:8px;color:var(--primary)}
-    .upload-zone p{margin:0;font-size:13px;font-weight:700;color:var(--muted)}
-    .upload-zone small{display:block;margin-top:4px;font-size:11px;color:var(--muted)}
-    .formas-pagamento{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-    .forma-tag{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;font-size:12px;font-weight:800;background:#f1f5f9;border:1px solid var(--line)}
-    .forma-tag.active{background:var(--primary-soft);color:var(--primary);border-color:var(--primary)}
-    .boleto-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:12px}
-    .boleto-card .icon{width:40px;height:40px;border-radius:10px;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center;font-size:18px;font-weight:800}
-    .boleto-card .info{flex:1}
-    .boleto-card .info h4{margin:0 0 2px;font-size:14px}
-    .boleto-card .info p{margin:0;font-size:12px;color:var(--muted);font-weight:700}
-    .boleto-card .actions{display:flex;gap:8px}
-    .cpr-garantia-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px}
-    .cpr-garantia-card h4{margin:0 0 8px;font-size:14px}
-    .cpr-garantia-card p{margin:0 0 12px;font-size:12px;color:var(--muted);font-weight:700}
-    .cpr-garantia-card .file-info{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f8fafc;border-radius:8px;border:1px solid var(--line)}
-    .cpr-garantia-card .file-info .file-icon{font-size:20px}
-    .cpr-garantia-card .file-info .file-name{flex:1;font-size:13px;font-weight:700}
-    .cpr-garantia-card .file-info .file-size{font-size:11px;color:var(--muted);font-weight:800}
     @media(max-width:1100px){.fin-grid-3{grid-template-columns:repeat(2,1fr)}.fin-grid-2{grid-template-columns:1fr}}
     @media(max-width:760px){.fin-grid-3{grid-template-columns:1fr}.fin-grid-2{grid-template-columns:1fr}}
+
+    /* ---- KPIs Financeiro ---- */
+    .fin-kpi-big{padding:24px 20px;position:relative;overflow:hidden;transition:var(--fin-transition);cursor:default}
+    .fin-kpi-big::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--fin-primary),var(--fin-purple));opacity:0;transition:var(--fin-transition)}
+    .fin-kpi-big:hover{transform:translateY(-3px);box-shadow:var(--fin-shadow-hover)}
+    .fin-kpi-big:hover::before{opacity:1}
+    .fin-kpi-big .kpi-icon{width:52px;height:52px;border-radius:14px;font-size:18px;transition:var(--fin-transition)}
+    .fin-kpi-big:hover .kpi-icon{transform:scale(1.08)}
+    .fin-kpi-big strong{font-size:26px;animation:countUp .6s ease}
+    .fin-kpi-big .trend{font-size:12px;color:var(--fin-muted);margin-top:4px;font-weight:700;display:flex;align-items:center;gap:4px}
+    .fin-kpi-big .trend.up{color:var(--fin-green-dark)}
+    .fin-kpi-big .trend.down{color:var(--fin-red)}
+    .fin-kpi-big .trend::before{content:'';width:0;height:0;border-style:solid}
+    .fin-kpi-big .trend.up::before{border-width:0 4px 5px 4px;border-color:transparent transparent var(--fin-green-dark) transparent}
+    .fin-kpi-big .trend.down::before{border-width:5px 4px 0 4px;border-color:var(--fin-red) transparent transparent transparent}
+
+    /* ---- Badges Financeiro ---- */
+    .badge.parcial{background:var(--fin-yellow-soft);color:#a16207}
+    .badge.vencido{background:var(--fin-red-soft);color:var(--fin-red-dark)}
+    .badge.recebido{background:var(--fin-green-soft);color:var(--fin-green-dark)}
+    .badge.pago{background:var(--fin-green-soft);color:var(--fin-green-dark)}
+    .badge.concluido{background:var(--fin-green-soft);color:var(--fin-green-dark)}
+    .badge.liquidada{background:var(--fin-green-soft);color:var(--fin-green-dark)}
+    .badge.emitida{background:var(--fin-blue-soft);color:var(--fin-blue)}
+    .badge.pendente{background:var(--fin-yellow-soft);color:#a16207}
+    .badge.atrasado{background:var(--fin-red-soft);color:var(--fin-red-dark)}
+    .badge.atrasada{background:var(--fin-red-soft);color:var(--fin-red-dark)}
+
+    /* ---- Ações Financeiro ---- */
+    .fin-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+    .fin-actions .btn{min-height:36px;padding:0 14px;font-size:13px;transition:var(--fin-transition);position:relative;overflow:hidden}
+    .fin-actions .btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.15);opacity:0;transition:var(--fin-transition-fast)}
+    .fin-actions .btn:hover::after{opacity:1}
+    .fin-actions .btn:active{transform:scale(.97)}
+    .fin-actions .btn.primary{box-shadow:0 4px 14px rgba(139,63,117,.35)}
+    .fin-actions .btn.secondary:hover{border-color:var(--fin-primary);color:var(--fin-primary)}
+
+    /* ---- Títulos de Seção ---- */
+    .fin-section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:40px 0 16px;padding-bottom:12px;border-bottom:2px solid var(--fin-line);position:relative}
+    .fin-section-title::after{content:'';position:absolute;bottom:-2px;left:0;width:60px;height:2px;background:var(--fin-primary);border-radius:2px}
+    .fin-section-title h2{margin:0;font-size:18px;display:flex;align-items:center;gap:8px}
+    .fin-section-title span{color:var(--fin-muted);font-size:13px;font-weight:700;background:var(--fin-bg);padding:4px 12px;border-radius:99px}
+
+    /* ---- Barras de Progresso ---- */
+    .progress-bar{height:8px;background:#edf2f7;border-radius:99px;overflow:hidden;margin-top:6px;position:relative}
+    .progress-bar::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:shimmer 2s infinite}
+    .progress-bar i{display:block;height:100%;border-radius:99px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+
+    /* ---- Cards Destaque ---- */
+    .fin-card-highlight{border-left:4px solid var(--fin-primary);transition:var(--fin-transition);position:relative}
+    .fin-card-highlight::before{content:'';position:absolute;inset:0;border-radius:var(--fin-radius);box-shadow:inset 0 0 0 1px transparent;transition:var(--fin-transition)}
+    .fin-card-highlight:hover::before{box-shadow:inset 0 0 0 1px var(--fin-primary-soft)}
+    .fin-card-highlight:hover{transform:translateX(4px);box-shadow:var(--fin-shadow-hover)}
+    .fin-card-highlight.red{border-left-color:var(--fin-red)}
+    .fin-card-highlight.yellow{border-left-color:var(--fin-yellow)}
+    .fin-card-highlight.green{border-left-color:var(--fin-green)}
+    .fin-card-highlight.blue{border-left-color:var(--fin-blue)}
+
+    /* ---- Detalhes em Linha ---- */
+    .fin-row-detail{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--fin-line)}
+    .fin-row-detail div{text-align:center;transition:var(--fin-transition-fast)}
+    .fin-row-detail div:hover{transform:translateY(-2px)}
+    .fin-row-detail div label{display:block;font-size:11px;color:var(--fin-muted);font-weight:800;margin-bottom:2px;text-transform:uppercase;letter-spacing:.03em}
+    .fin-row-detail div span{font-size:14px;font-weight:800;color:var(--fin-text)}
+
+    /* ---- Gráfico de Barras (Fluxo de Caixa) ---- */
+    .chart-area{height:220px;position:relative;padding:16px 12px 32px;border-bottom:2px solid var(--fin-line);display:flex;align-items:flex-end;gap:8px}
+    .chart-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;position:relative;cursor:pointer;transition:var(--fin-transition-fast)}
+    .chart-col:hover{transform:translateY(-4px)}
+    .chart-col:hover .chart-bar{filter:brightness(1.1)}
+    .chart-bars{display:flex;align-items:flex-end;gap:3px;width:100%;justify-content:center}
+    .chart-bar{width:18px;border-radius:4px 4px 0 0;transition:var(--fin-transition);position:relative}
+    .chart-bar.entrada{background:linear-gradient(180deg,var(--fin-green),#16a34a)}
+    .chart-bar.saida{background:linear-gradient(180deg,var(--fin-red),#dc2626);opacity:.7}
+    .chart-bar::after{content:attr(data-val);position:absolute;top:-18px;left:50%;transform:translateX(-50%) scale(0);font-size:9px;font-weight:800;color:var(--fin-text);white-space:nowrap;background:rgba(255,255,255,.95);padding:2px 6px;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.1);transition:var(--fin-transition-fast);pointer-events:none}
+    .chart-col:hover .chart-bar::after{transform:translateX(-50%) scale(1)}
+    .chart-col label{font-size:10px;color:var(--fin-muted);font-weight:800;margin-top:4px}
+    .chart-col .val{font-size:9px;font-weight:800;color:var(--fin-muted);white-space:nowrap}
+    .chart-legend{display:flex;gap:20px;justify-content:center;margin-top:12px;font-size:12px;font-weight:800}
+    .chart-legend span{display:flex;align-items:center;gap:6px;cursor:pointer;transition:var(--fin-transition-fast);padding:4px 8px;border-radius:6px}
+    .chart-legend span:hover{background:var(--fin-bg)}
+    .chart-legend .dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+
+    /* ---- Gráfico Doughnut ---- */
+    .doughnut-wrap{width:130px;height:130px;position:relative;margin:auto;flex-shrink:0}
+    .doughnut-wrap svg{transform:rotate(-90deg);filter:drop-shadow(0 2px 8px rgba(0,0,0,.08))}
+    .doughnut-center{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+    .doughnut-center strong{font-size:18px;color:var(--fin-text);transition:var(--fin-transition)}
+    .doughnut-center span{font-size:10px;color:var(--fin-muted);font-weight:800}
+    .legend-grid{display:grid;gap:10px}
+    .legend-row{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;padding:6px 10px;border-radius:8px;transition:var(--fin-transition-fast);cursor:pointer}
+    .legend-row:hover{background:var(--fin-bg)}
+    .legend-dot{width:10px;height:10px;border-radius:3px;transition:var(--fin-transition)}
+    .legend-row:hover .legend-dot{transform:scale(1.2)}
+    .legend-row span{flex:1;color:var(--fin-muted)}
+    .legend-row strong{color:var(--fin-text);font-size:14px}
+
+    /* ---- Comissão Cards ---- */
+    .comissao-card{background:white;border:1px solid var(--fin-line);border-radius:var(--fin-radius);padding:16px 18px;box-shadow:var(--fin-shadow);display:flex;align-items:center;gap:14px;transition:var(--fin-transition);cursor:pointer}
+    .comissao-card:hover{transform:translateY(-2px);box-shadow:var(--fin-shadow-hover);border-color:var(--fin-primary-soft)}
+    .comissao-card .avatar-mini{width:44px;height:44px;font-size:16px;transition:var(--fin-transition)}
+    .comissao-card:hover .avatar-mini{transform:scale(1.05)}
+    .comissao-card .info{flex:1}
+    .comissao-card .info h4{margin:0 0 4px;font-size:15px;transition:var(--fin-transition-fast)}
+    .comissao-card:hover .info h4{color:var(--fin-primary)}
+    .comissao-card .info p{margin:0;color:var(--fin-muted);font-size:12px;font-weight:700}
+    .comissao-card .valor{text-align:right}
+    .comissao-card .valor strong{font-size:18px;color:var(--fin-primary)}
+    .comissao-card .valor span{font-size:11px;color:var(--fin-muted);font-weight:800}
+
+    /* ---- Mini Stats ---- */
+    .mini-stat{display:flex;gap:16px;margin-top:8px}
+    .mini-stat div{font-size:12px;font-weight:800;color:var(--fin-muted);transition:var(--fin-transition-fast)}
+    .mini-stat div:hover{color:var(--fin-text)}
+    .mini-stat div strong{color:var(--fin-text);font-size:13px}
+
+    /* ---- Status Pills ---- */
+    .status-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:900;transition:var(--fin-transition-fast);cursor:default}
+    .status-pill:hover{transform:scale(1.05)}
+    .status-pill.ok{background:var(--fin-green-soft);color:var(--fin-green-dark)}
+    .status-pill.pending{background:var(--fin-yellow-soft);color:#a16207}
+    .status-pill.danger{background:var(--fin-red-soft);color:var(--fin-red-dark)}
+    .status-pill.info{background:var(--fin-blue-soft);color:var(--fin-blue)}
+    .status-pill .dot{width:6px;height:6px;border-radius:50%;display:inline-block;animation:pulse 2s infinite}
+    .status-pill.ok .dot{background:var(--fin-green-dark)}
+    .status-pill.pending .dot{background:#a16207}
+    .status-pill.danger .dot{background:var(--fin-red-dark)}
+    .status-pill.info .dot{background:var(--fin-blue)}
+
+    /* ---- Info Boxes ---- */
+    .info-box{background:linear-gradient(135deg,#f8fafc,#f1f5f9);border:1px solid var(--fin-line);border-radius:var(--fin-radius);padding:16px 20px;margin-bottom:16px;font-size:13px;color:var(--fin-muted);line-height:1.7;position:relative;overflow:hidden}
+    .info-box::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--fin-primary);border-radius:4px 0 0 4px}
+    .info-box strong{color:var(--fin-text);font-weight:800}
+    .info-box i{color:var(--fin-primary);font-style:normal;font-weight:800}
+    .info-box:hover{box-shadow:var(--fin-shadow);transform:translateY(-1px);transition:var(--fin-transition)}
+
+    /* ---- Upload Zone ---- */
+    .upload-zone{border:2px dashed var(--fin-line);border-radius:var(--fin-radius);padding:28px;text-align:center;cursor:pointer;transition:var(--fin-transition);background:linear-gradient(135deg,#fafbfc,#f8fafc);position:relative;overflow:hidden}
+    .upload-zone:hover{border-color:var(--fin-primary);background:linear-gradient(135deg,#f0f7ff,#f7edf4);transform:translateY(-2px);box-shadow:var(--fin-shadow)}
+    .upload-zone .icon{font-size:32px;margin-bottom:10px;color:var(--fin-primary);transition:var(--fin-transition);display:inline-block}
+    .upload-zone:hover .icon{transform:scale(1.1) rotate(-5deg)}
+    .upload-zone p{margin:0;font-size:13px;font-weight:700;color:var(--fin-muted)}
+    .upload-zone small{display:block;margin-top:6px;font-size:11px;color:var(--fin-muted);font-weight:600}
+
+    /* ---- CPR Garantia Card ---- */
+    .cpr-garantia-card{background:#fff;border:1px solid var(--fin-line);border-radius:var(--fin-radius);padding:18px;margin-bottom:12px;transition:var(--fin-transition)}
+    .cpr-garantia-card:hover{box-shadow:var(--fin-shadow);border-color:var(--fin-primary-soft)}
+    .cpr-garantia-card h4{margin:0 0 8px;font-size:14px;color:var(--fin-text)}
+    .cpr-garantia-card p{margin:0 0 14px;font-size:12px;color:var(--fin-muted);font-weight:700}
+    .cpr-garantia-card .file-info{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#f8fafc;border-radius:10px;border:1px solid var(--fin-line);transition:var(--fin-transition-fast)}
+    .cpr-garantia-card .file-info:hover{background:#f1f5f9;border-color:var(--fin-primary-soft)}
+    .cpr-garantia-card .file-info .file-icon{font-size:22px;transition:var(--fin-transition-fast)}
+    .cpr-garantia-card .file-info:hover .file-icon{transform:scale(1.1)}
+    .cpr-garantia-card .file-info .file-name{flex:1;font-size:13px;font-weight:700;color:var(--fin-text)}
+    .cpr-garantia-card .file-info .file-size{font-size:11px;color:var(--fin-muted);font-weight:800;background:var(--fin-bg);padding:2px 8px;border-radius:99px}
+
+    /* ---- Tabela Financeiro Melhorada ---- */
+    .fin-table-wrap{overflow:auto;border-radius:14px;border:1px solid var(--fin-line);position:relative}
+    .fin-table-wrap::after{content:'';position:absolute;top:0;right:0;bottom:0;width:30px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.8));pointer-events:none;opacity:0;transition:var(--fin-transition)}
+    .fin-table-wrap.scrolled::after{opacity:1}
+    .fin-table-wrap table{width:100%;border-collapse:collapse;min-width:900px;background:white}
+    .fin-table-wrap th{background:linear-gradient(180deg,#f8fafc,#f1f5f9);color:#334155;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:14px 16px;border-bottom:2px solid var(--fin-line);font-weight:900;position:sticky;top:0;z-index:5;white-space:nowrap;cursor:pointer;transition:var(--fin-transition-fast);user-select:none}
+    .fin-table-wrap th:hover{background:#e2e8f0;color:var(--fin-primary)}
+    .fin-table-wrap th.sortable::after{content:'↕';margin-left:6px;font-size:10px;opacity:.4}
+    .fin-table-wrap th.sort-asc::after{content:'↑';opacity:1;color:var(--fin-primary)}
+    .fin-table-wrap th.sort-desc::after{content:'↓';opacity:1;color:var(--fin-primary)}
+    .fin-table-wrap td{padding:14px 16px;border-bottom:1px solid var(--fin-line);vertical-align:middle;transition:var(--fin-transition-fast);font-size:13px}
+    .fin-table-wrap tr{transition:var(--fin-transition-fast)}
+    .fin-table-wrap tr:hover td{background:#fcfcff}
+    .fin-table-wrap tr:hover{box-shadow:inset 2px 0 0 var(--fin-primary)}
+    .fin-table-wrap .empty{padding:40px;text-align:center;color:var(--fin-muted);font-size:14px}
+    .fin-table-wrap .empty::before{content:'📭';display:block;font-size:40px;margin-bottom:12px;opacity:.5}
+
+    /* ---- Link Buttons Melhorados ---- */
+    .fin-link-btn{border:0;background:transparent;color:var(--fin-primary);font-weight:950;padding:4px 8px;border-radius:6px;font-size:12px;cursor:pointer;transition:var(--fin-transition-fast);position:relative}
+    .fin-link-btn:hover{background:var(--fin-primary-soft);color:var(--fin-primary-dark)}
+    .fin-link-btn.danger{color:var(--fin-red)}
+    .fin-link-btn.danger:hover{background:var(--fin-red-soft);color:var(--fin-red-dark)}
+    .fin-link-btn::after{content:'';position:absolute;bottom:2px;left:8px;right:8px;height:1px;background:currentColor;transform:scaleX(0);transition:var(--fin-transition-fast)}
+    .fin-link-btn:hover::after{transform:scaleX(1)}
+
+    /* ---- Search & Filter Bar ---- */
+    .fin-search-bar{display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+    .fin-search-bar input{flex:1;min-width:200px;border:1px solid var(--fin-line-dark);border-radius:10px;height:40px;padding:0 14px 0 38px;background:white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 12px center;background-size:16px;outline:none;font-size:14px;transition:var(--fin-transition)}
+    .fin-search-bar input:focus{border-color:var(--fin-primary);box-shadow:0 0 0 3px rgba(139,63,117,.12)}
+    .fin-search-bar select{border:1px solid var(--fin-line-dark);border-radius:10px;height:40px;padding:0 32px 0 12px;background:white;outline:none;font-size:13px;font-weight:700;color:var(--fin-text);cursor:pointer;transition:var(--fin-transition);appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+    .fin-search-bar select:focus{border-color:var(--fin-primary);box-shadow:0 0 0 3px rgba(139,63,117,.12)}
+
+    /* ---- Export Dropdown ---- */
+    .fin-export-wrap{position:relative;display:inline-block}
+    .fin-export-menu{position:absolute;top:calc(100% + 6px);right:0;background:white;border:1px solid var(--fin-line);border-radius:10px;box-shadow:var(--fin-shadow-lg);padding:6px;min-width:160px;z-index:50;opacity:0;visibility:hidden;transform:translateY(-8px);transition:var(--fin-transition)}
+    .fin-export-wrap.open .fin-export-menu{opacity:1;visibility:visible;transform:translateY(0)}
+    .fin-export-menu button{display:flex;align-items:center;gap:8px;width:100%;border:0;background:transparent;padding:8px 12px;border-radius:6px;font-size:13px;font-weight:700;color:var(--fin-text);cursor:pointer;transition:var(--fin-transition-fast);text-align:left}
+    .fin-export-menu button:hover{background:var(--fin-primary-soft);color:var(--fin-primary)}
+
+    /* ---- Toast Melhorado ---- */
+    .toast{position:fixed;right:22px;bottom:22px;background:#0f172a;color:white;padding:14px 18px;border-radius:12px;box-shadow:var(--fin-shadow-lg);display:none;z-index:120;font-weight:800;font-size:13px;align-items:center;gap:10px;animation:none;max-width:380px;line-height:1.4}
+    .toast.show{display:flex;animation:toastSlide .4s cubic-bezier(.16,1,.3,1)}
+    .toast-icon{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;flex-shrink:0}
+    .toast-icon.ok{background:var(--fin-green);color:white}
+    .toast-icon.info{background:var(--fin-blue);color:white}
+    .toast-icon.warn{background:var(--fin-yellow);color:white}
+    .toast-icon.error{background:var(--fin-red);color:white}
+
+    /* ---- Modal Melhorado ---- */
+    .modal{display:none;position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:100;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
+    .modal.open{display:flex;animation:modalBackdrop .25s ease}
+    .modal-card{width:min(780px,100%);max-height:88vh;overflow:auto;background:white;border-radius:18px;box-shadow:var(--fin-shadow-lg);animation:modalCard .35s cubic-bezier(.16,1,.3,1)}
+    .modal-head{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--fin-line);background:linear-gradient(180deg,#fafbfc,white)}
+    .modal-head h2{margin:0;font-size:18px;color:var(--fin-text)}
+    #modalBody{padding:24px}
+    .modal-actions{display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid var(--fin-line);background:#fafbfc}
+    .modal-actions .btn{min-height:40px;padding:0 20px;font-size:14px}
+
+    /* ---- Loading Skeleton ---- */
+    .skeleton{background:linear-gradient(90deg,#e2e8f0 25%,#f1f5f9 50%,#e2e8f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px}
+    .skeleton-text{height:14px;margin:6px 0;border-radius:4px}
+    .skeleton-title{height:18px;width:60%;margin-bottom:12px;border-radius:4px}
+    .skeleton-circle{width:44px;height:44px;border-radius:50%}
+
+    /* ---- Print Styles ---- */
+    @media print{
+      .sidebar,.topbar,.bottom-nav,.fin-actions,.toast,.modal,.hamburger{display:none!important}
+      .main{margin-left:0!important;width:100%!important}
+      .content{padding:0!important}
+      .card{box-shadow:none!important;border:1px solid #ccc!important;break-inside:avoid}
+      .fin-section-title{border-bottom:2px solid #333!important}
+      .fin-section-title::after{display:none}
+      .chart-bar{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+      body{background:white!important}
+    }
+
+    /* ---- Scrollbar Styling ---- */
+    .fin-table-wrap::-webkit-scrollbar{height:8px}
+    .fin-table-wrap::-webkit-scrollbar-track{background:#f1f5f9;border-radius:4px}
+    .fin-table-wrap::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
+    .fin-table-wrap::-webkit-scrollbar-thumb:hover{background:#94a3b8}
+
+    /* ---- Tooltip ---- */
+    [data-tooltip]{position:relative}
+    [data-tooltip]::after{content:attr(data-tooltip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%) scale(0);background:#0f172a;color:white;padding:6px 10px;border-radius:6px;font-size:11px;font-weight:700;white-space:nowrap;z-index:100;pointer-events:none;transition:var(--fin-transition-fast);opacity:0}
+    [data-tooltip]:hover::after{transform:translateX(-50%) scale(1);opacity:1}
+
+    /* ---- Seletor de Data ---- */
+    .date-range{display:flex;align-items:center;gap:8px;background:white;border:1px solid var(--fin-line-dark);border-radius:10px;padding:0 12px;height:40px;cursor:pointer;transition:var(--fin-transition);font-size:13px;font-weight:700;color:var(--fin-text)}
+    .date-range:hover{border-color:var(--fin-primary)}
+    .date-range svg{width:16px;height:16px;color:var(--fin-muted);flex-shrink:0}
+
+    /* ---- Resumo Rápido ---- */
+    .fin-quick-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+    .fin-quick-item{background:white;border:1px solid var(--fin-line);border-radius:var(--fin-radius-sm);padding:14px;text-align:center;transition:var(--fin-transition);cursor:default}
+    .fin-quick-item:hover{transform:translateY(-2px);box-shadow:var(--fin-shadow);border-color:var(--fin-primary-soft)}
+    .fin-quick-item .label{font-size:11px;color:var(--fin-muted);font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+    .fin-quick-item .value{font-size:20px;font-weight:900;color:var(--fin-text)}
+    .fin-quick-item .sub{font-size:11px;color:var(--fin-muted);font-weight:700;margin-top:4px}
+
+    /* ---- Animação de entrada para cards ---- */
+    .card{animation:fadeInUp .5s ease backwards}
+    .card:nth-child(1){animation-delay:.05s}
+    .card:nth-child(2){animation-delay:.1s}
+    .card:nth-child(3){animation-delay:.15s}
+    .card:nth-child(4){animation-delay:.2s}
+    .card:nth-child(5){animation-delay:.25s}
+    .card:nth-child(6){animation-delay:.3s}
+
+    /* ---- Checkbox estilizado ---- */
+    .fin-checkbox{width:18px;height:18px;border:2px solid var(--fin-line-dark);border-radius:5px;cursor:pointer;transition:var(--fin-transition-fast);appearance:none;position:relative}
+    .fin-checkbox:checked{background:var(--fin-primary);border-color:var(--fin-primary)}
+    .fin-checkbox:checked::after{content:'';position:absolute;left:5px;top:2px;width:5px;height:9px;border:solid white;border-width:0 2px 2px 0;transform:rotate(45deg)}
+    .fin-checkbox:hover{border-color:var(--fin-primary)}
+
+    /* ---- Paginação ---- */
+    .fin-pagination{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:16px;padding-top:16px;border-top:1px solid var(--fin-line)}
+    .fin-pagination button{width:36px;height:36px;border:1px solid var(--fin-line);background:white;border-radius:8px;font-size:13px;font-weight:800;color:var(--fin-text);cursor:pointer;transition:var(--fin-transition-fast);display:grid;place-items:center}
+    .fin-pagination button:hover{border-color:var(--fin-primary);color:var(--fin-primary)}
+    .fin-pagination button.active{background:var(--fin-primary);color:white;border-color:var(--fin-primary)}
+    .fin-pagination button:disabled{opacity:.4;cursor:not-allowed}
+    .fin-pagination .page-info{font-size:13px;color:var(--fin-muted);font-weight:700;margin:0 12px}
+
+    /* ---- Atalhos de Teclado Badge ---- */
+    .kbd{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 6px;background:#f1f5f9;border:1px solid var(--fin-line-dark);border-radius:5px;font-size:11px;font-weight:800;color:var(--fin-muted);font-family:monospace}
+
+    /* ---- Relógio no Header ---- */
+    .fin-clock{font-size:13px;font-weight:700;color:var(--fin-muted);display:flex;align-items:center;gap:6px}
+    .fin-clock .live-dot{width:6px;height:6px;border-radius:50%;background:var(--fin-green);animation:pulse 2s infinite}
   </style>
 </head>
 <body>
@@ -129,7 +382,7 @@
       </div>
       <div class="sidebar-footer">
         <button class="footer-btn" onclick="location.href='configuracoes.html'">Editar Perfil</button>
-        <button class="footer-btn primary" onclick="showToast('Saída simulada. Em sistema real, encerraria a sessão.'); setTimeout(()=>location.href='index.html',1500)">Sair</button>
+        <button class="footer-btn primary" onclick="showToast('Saída simulada. Em sistema real, encerraria a sessão.', 'info'); setTimeout(()=>location.href='index.html',1500)">Sair</button>
       </div>
     </aside>
     <div class="overlay" id="overlay"></div>
@@ -138,12 +391,13 @@
         <button class="hamburger" id="openSidebar">☰</button>
         <div>
           <strong id="breadcrumb">Next Agrolink / Financeiro</strong>
-          <small>Protótipo funcional </small>
+          <small>Relatório Financeiro · Safra 2025/2026</small>
         </div>
-        <input id="globalSearch" class="search" placeholder="Pesquisar no sistema...">
+        <div class="fin-clock" id="clock"><span class="live-dot"></span><span id="clockTime">--:--</span></div>
+        <input id="globalSearch" class="search" placeholder="Pesquisar no sistema... (Ctrl+K)">
         <div class="user-pill"><span>Bruno Cavalcante</span><b>B</b></div>
       </header>
-      <section class="content" id="content"></section>
+      <section class="content fin-page" id="content"></section>
     </main>
   </div>
   <nav class="bottom-nav">
@@ -153,6 +407,7 @@
     <button onclick="location.href='produtos.html'">✦<span>Produtos</span></button>
     <button onclick="location.href='relatorios.html'">▰<span>BI</span></button>
   </nav>
+
   <div class="modal" id="modal">
     <div class="modal-card">
       <div class="modal-head"><h2 id="modalTitle">Modal</h2><button class="icon-btn" id="modalClose">×</button></div>
@@ -163,14 +418,23 @@
       </div>
     </div>
   </div>
-  <div class="toast" id="toast"></div>
+
+  <div class="toast" id="toast"><span class="toast-icon" id="toastIcon"></span><span id="toastText"></span></div>
 
   <script>
+
+// ================================================================
+// NEXT AGROLINK - MÓDULO FINANCEIRO v2.0
+// Sistema comercial-grade para gestão financeira agrícola
+// ================================================================
+
 const state = {
   page: 'financeiro',
   selectedProduct: null, selectedClient: null, selectedOrder: null,
   dashboardMonths: ['Jun','Jul','Ago','Set','Out','Nov','Dez','Jan','Fev','Mar','Abr','Mai'],
   dashboardSales: [27680,30000,26680,19680,7680,14680,17680,19680,37680,42680,35680,40680],
+  sortState: {col:null,dir:'asc'},
+  filters: {receber:'todos',comissoes:'todos',search:''},
   clientes: [
     {id:1, nome:'DORNELLES REOLON', telefone:'67 99853-1578', documento:'39.597.359/0002-76', cidade:'Douradina', uf:'MS', area:'780 ha', fazenda:'Agua Fria', culturas:'Soja / Milho', potencial:'Alto', status:'Ativo'},
     {id:2, nome:'DOUGLAS DE CARVALHO', telefone:'67 99785-1945', documento:'12.456.789/0001-55', cidade:'Rio Brilhante', uf:'MS', area:'1200 ha', fazenda:'Santa Luzia', culturas:'Soja', potencial:'Estrategico', status:'Ativo'},
@@ -240,12 +504,6 @@ const state = {
       {id:'CPR-002', cliente:'DUQUE BASSO', pedido:'000251', valor:121769.18, taxa:9.2, vencimento:'30/03/2027', banco:'Bradesco Rural', status:'Emitida', arquivoCPR:'cpr_duque_000251.pdf', arquivoTamanho:'1.5 MB'},
       {id:'CPR-003', cliente:'EDEMILSON LUIZ VIEIRA', pedido:'000702', valor:25680.00, taxa:8.0, vencimento:'30/03/2027', banco:'Itau Agro', status:'Liquidada', arquivoCPR:'cpr_edemilson_000702.pdf', arquivoTamanho:'890 KB'}
     ],
-    boletos: [
-      {id:'BOL-001', pedido:'000178', cliente:'DOUGLAS DE CARVALHO', valor:68768.65, vencimento:'30/03/2027', parcela:'1/3', status:'Em aberto', codigoBarras:'34191.79001 01043.510047 91020.150008 8 89250000068768'},
-      {id:'BOL-002', pedido:'000412', cliente:'DOUGLAS DE CARVALHO', valor:52340.50, vencimento:'15/04/2027', parcela:'1/3', status:'Parcial', codigoBarras:'34191.79001 01043.510047 91020.150008 8 89250000052340'},
-      {id:'BOL-003', pedido:'000251', cliente:'DUQUE BASSO', valor:121769.18, vencimento:'30/03/2027', parcela:'1/4', status:'Em aberto', codigoBarras:'34191.79001 01043.510047 91020.150008 8 89250000121769'},
-      {id:'BOL-004', pedido:'000702', cliente:'EDEMILSON LUIZ VIEIRA', valor:45680.00, vencimento:'30/03/2027', parcela:'2/3', status:'Parcial', codigoBarras:'34191.79001 01043.510047 91020.150008 8 89250000045680'}
-    ],
     fluxoCaixa: [
       {mes:'Jul/25', entrada:185000.00, saida:142000.00, saldo:43000.00},
       {mes:'Ago/25', entrada:210000.00, saida:165000.00, saldo:45000.00},
@@ -258,70 +516,176 @@ const state = {
 };
 
 const BRL = v => Number(v || 0).toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+const NUM = v => Number(v || 0).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
 const cls = status => {
   const s = String(status || '').toLowerCase();
   if(s.includes('ativo') || s.includes('liberado') || s.includes('entregue') || s.includes('aprov') || s.includes('receb') || s.includes('pago') || s.includes('concluido') || s.includes('liquidada')) return 'ok';
   if(s.includes('faturado') || s.includes('autorizado') || s.includes('em transporte') || s.includes('emitida')) return 'info';
-  if(s.includes('cancel') || s.includes('venc') || s.includes('bloque') || s.includes('reprov') || s.includes('atrasado')) return 'danger';
+  if(s.includes('cancel') || s.includes('venc') || s.includes('bloque') || s.includes('reprov') || s.includes('atrasado') || s.includes('atrasada')) return 'danger';
   if(s.includes('parcial') || s.includes('pendente') || s.includes('em aberto') || s.includes('a vencer') || s.includes('a pagar')) return 'pending';
   return 'pending';
 };
 const badge = s => `<span class="badge ${cls(s)}">${s}</span>`;
 const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
-function showToast(msg){
+// ---- Toast Melhorado ----
+function showToast(msg, type='ok'){
   const toast = document.getElementById('toast');
-  toast.textContent = msg;
+  const text = document.getElementById('toastText');
+  const icon = document.getElementById('toastIcon');
+  const icons = {ok:'✓', info:'ℹ', warn:'⚠', error:'✕'};
+  text.textContent = msg;
+  icon.textContent = icons[type] || icons.ok;
+  icon.className = 'toast-icon ' + type;
   toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2400);
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => toast.classList.remove('show'), 3000);
 }
-function modal(title, body, onConfirm, confirmText='Confirmar'){
+
+// ---- Modal Melhorado ----
+function modal(title, body, onConfirm, confirmText='Confirmar', cancelText='Cancelar'){
   document.getElementById('modalTitle').textContent = title;
   document.getElementById('modalBody').innerHTML = body;
   document.getElementById('modalConfirm').textContent = confirmText;
+  document.getElementById('modalCancel').textContent = cancelText;
   const m = document.getElementById('modal');
   m.classList.add('open');
+  document.body.style.overflow = 'hidden';
   const confirm = document.getElementById('modalConfirm');
-  confirm.onclick = () => { if(onConfirm) onConfirm(); m.classList.remove('open'); };
+  confirm.onclick = () => { if(onConfirm) onConfirm(); closeModal(); };
+  // Focus trap
+  setTimeout(() => document.getElementById('modalConfirm').focus(), 100);
 }
-function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+function closeModal(){ 
+  document.getElementById('modal').classList.remove('open'); 
+  document.body.style.overflow = '';
+}
+
+// ---- Helpers ----
 function pageHead(title, subtitle, actions=''){
   return `<div class="page-head"><div><h1>${title}</h1><p class="subtitle">${subtitle}</p></div><div class="actions">${actions}</div></div>`;
 }
-function table(headers, rows, empty='Nenhum registro encontrado.'){
-  return `<div class="table-wrap"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.length?rows.join(''):`<tr><td colspan="${headers.length}" class="empty">${empty}</td></tr>`}</tbody></table></div>`;
+function table(headers, rows, empty='Nenhum registro encontrado.', sortable=false){
+  const ths = headers.map((h,i) => {
+    if(!sortable || i===0) return `<th>${h}</th>`;
+    const sort = state.sortState.col === i ? (state.sortState.dir==='asc'?'sort-asc':'sort-desc') : 'sortable';
+    return `<th class="${sort}" onclick="sortTable(${i},'${h}')" data-tooltip="Ordenar por ${h}">${h}</th>`;
+  }).join('');
+  return `<div class="fin-table-wrap" onscroll="this.classList.toggle('scrolled',this.scrollLeft>10)"><table><thead><tr>${ths}</tr></thead><tbody>${rows.length?rows.join(''):`<tr><td colspan="${headers.length}" class="empty">${empty}</td></tr>`}</tbody></table></div>`;
 }
 function input(id,label,value='',extra=''){ return `<div class="field ${extra}"><label>${label}</label><input id="${id}" value="${esc(value)}"></div>`; }
 function select(id,label,options,value='',extra=''){ return `<div class="field ${extra}"><label>${label}</label><select id="${id}">${options.map(o=>`<option ${o==value?'selected':''}>${o}</option>`).join('')}</select></div>`; }
 function getFormData(ids){ const obj={}; ids.forEach(id=>{ const el=document.getElementById(id); obj[id]=el?el.value:''; }); return obj; }
-function exportar(nome){ showToast(`Exportacao de ${nome} simulada com sucesso`); }
 
+// ---- Relógio ao vivo ----
+function updateClock(){
+  const now = new Date();
+  const time = now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const date = now.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
+  const el = document.getElementById('clockTime');
+  if(el) el.textContent = date + ' · ' + time;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ---- Exportar CSV Real ----
+function exportarCSV(titulo, headers, rows){
+  const csv = [headers.join(';'), ...rows.map(r => r.join(';'))].join('\n');
+  const blob = new Blob(["\uFEFF" + csv], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `nextagrolink_${titulo.toLowerCase().replace(/\s+/g,'_')}_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(`Relatório "${titulo}" exportado em CSV`, 'ok');
+}
+
+function exportarPDF(titulo){
+  window.print();
+  showToast(`Relatório "${titulo}" enviado para impressão`, 'info');
+}
+
+function toggleExport(el){
+  el.closest('.fin-export-wrap').classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  if(!e.target.closest('.fin-export-wrap')){
+    document.querySelectorAll('.fin-export-wrap').forEach(w => w.classList.remove('open'));
+  }
+});
+
+// ---- Badges Financeiro ----
 function finBadge(s){
   const sl = String(s||'').toLowerCase();
-  if(sl.includes('recebido') || sl.includes('pago') || sl.includes('concluido') || sl.includes('liquidada')) return `<span class="badge ok">${s}</span>`;
+  if(sl.includes('recebido') || sl.includes('pago') || sl.includes('concluido') || sl.includes('liquidada')) return `<span class="badge recebido">${s}</span>`;
   if(sl.includes('parcial')) return `<span class="badge parcial">${s}</span>`;
   if(sl.includes('vencido') || sl.includes('atrasado') || sl.includes('atrasada')) return `<span class="badge vencido">${s}</span>`;
-  if(sl.includes('em aberto') || sl.includes('pendente') || sl.includes('a vencer') || sl.includes('a pagar')) return `<span class="badge pending">${s}</span>`;
-  if(sl.includes('emitida')) return `<span class="badge info">${s}</span>`;
-  return `<span class="badge pending">${s}</span>`;
+  if(sl.includes('em aberto') || sl.includes('pendente') || sl.includes('a vencer') || sl.includes('a pagar')) return `<span class="badge pendente">${s}</span>`;
+  if(sl.includes('emitida')) return `<span class="badge emitida">${s}</span>`;
+  return `<span class="badge pendente">${s}</span>`;
 }
 
 function statusPill(s){
   const sl = String(s||'').toLowerCase();
-  if(sl.includes('paga')) return `<span class="status-pill ok"><span style="width:6px;height:6px;border-radius:50%;background:#15803d;display:inline-block"></span> ${s}</span>`;
-  if(sl.includes('atrasada')) return `<span class="status-pill danger"><span style="width:6px;height:6px;border-radius:50%;background:var(--red);display:inline-block"></span> ${s}</span>`;
-  return `<span class="status-pill pending"><span style="width:6px;height:6px;border-radius:50%;background:#a16207;display:inline-block"></span> ${s}</span>`;
+  if(sl.includes('paga')) return `<span class="status-pill ok"><span class="dot"></span> ${s}</span>`;
+  if(sl.includes('atrasada')) return `<span class="status-pill danger"><span class="dot"></span> ${s}</span>`;
+  return `<span class="status-pill pending"><span class="dot"></span> ${s}</span>`;
 }
 
+// ---- Ordenação de Tabela ----
+function sortTable(colIdx, colName){
+  if(state.sortState.col === colIdx){
+    state.sortState.dir = state.sortState.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    state.sortState.col = colIdx;
+    state.sortState.dir = 'asc';
+  }
+  render();
+  showToast(`Ordenado por ${colName} (${state.sortState.dir==='asc'?'crescente':'decrescente'})`, 'info');
+}
+
+// ---- Busca em Tempo Real ----
+let searchDebounce;
+function onSearch(section, value){
+  clearTimeout(searchDebounce);
+  searchDebounce = setTimeout(() => {
+    state.filters[section] = value;
+    render();
+  }, 250);
+}
+
+// ---- Seleção em Massa ----
+let lastChecked = null;
+function toggleSelectAll(tableId, checked){
+  document.querySelectorAll(`#${tableId} .fin-checkbox`).forEach(cb => cb.checked = checked);
+}
+function handleCheckbox(e, id){
+  if(e.shiftKey && lastChecked !== null){
+    const cbs = Array.from(document.querySelectorAll('.fin-checkbox'));
+    const start = cbs.findIndex(cb => cb.dataset.id === lastChecked);
+    const end = cbs.findIndex(cb => cb.dataset.id === id);
+    const [min, max] = [Math.min(start,end), Math.max(start,end)];
+    for(let i=min; i<=max; i++) cbs[i].checked = true;
+  }
+  lastChecked = id;
+}
+
+
+// ================================================================
+// FUNÇÃO PRINCIPAL - FINANCEIRO
+// ================================================================
 function financeiro(){
   const fin = state.financeiro;
   const receber = fin.contasReceber;
   const comissoes = fin.comissoesPagar;
   const barter = fin.barter;
   const cpr = fin.cpr;
-  const boletos = fin.boletos;
   const fluxo = fin.fluxoCaixa;
 
+  // ---- Cálculos Financeiros ----
   const totalVendas = receber.reduce((a,b)=>a+b.valorVenda,0);
   const totalRecebido = receber.reduce((a,b)=>a+b.valorRecebido,0);
   const totalReceber = receber.reduce((a,b)=>a+(b.valorVenda-b.valorRecebido),0);
@@ -336,61 +700,133 @@ function financeiro(){
   const totalCpr = cpr.reduce((a,b)=>a+b.valor,0);
   const saldoCaixa = fluxo[fluxo.length-1].saldo;
 
-  const receberRows = receber.map(r=>{
-    const pct = r.valorVenda>0 ? Math.round(r.valorRecebido/r.valorVenda*100) : 0;
-    return `<tr><td><input type="checkbox"></td><td><b>${r.id}</b></td><td>${r.pedido}</td><td><div class="name-cell"><div class="avatar-mini">${r.cliente[0]}</div>${esc(r.cliente)}</div></td><td>${BRL(r.valorVenda)}</td><td>${BRL(r.valorRecebido)}</td><td><div class="progress-bar"><i style="width:${pct}%;background:${pct>=100?'var(--green)':pct>0?'var(--yellow)':'var(--line-dark)'};transition:width .4s"></i></div><small style="font-size:11px;font-weight:800;color:var(--muted)">${pct}%</small></td><td>${r.dataPrevista}</td><td>${r.dataRecebida||'—'}</td><td>${esc(r.formaPagamento)}</td><td>${finBadge(r.status)}</td><td><div class="table-actions"><button class="link-btn" onclick="receberConta('${r.id}')">Receber</button><button class="link-btn" onclick="verRecibo('${r.id}')">Recibo</button></div></td></tr>`;
+  // ---- Filtros ----
+  const searchTerm = (state.filters.search || '').toLowerCase();
+  const receberFiltered = receber.filter(r => {
+    const matchesFilter = state.filters.receber === 'todos' || r.status === state.filters.receber;
+    const matchesSearch = !searchTerm || 
+      r.cliente.toLowerCase().includes(searchTerm) || 
+      r.id.toLowerCase().includes(searchTerm) ||
+      r.pedido.toLowerCase().includes(searchTerm);
+    return matchesFilter && matchesSearch;
+  });
+  const comissoesFiltered = comissoes.filter(c => {
+    const matchesFilter = state.filters.comissoes === 'todos' || c.status === state.filters.comissoes;
+    const matchesSearch = !searchTerm || 
+      c.representante.toLowerCase().includes(searchTerm) || 
+      c.cliente.toLowerCase().includes(searchTerm) ||
+      c.id.toLowerCase().includes(searchTerm);
+    return matchesFilter && matchesSearch;
   });
 
-  const comissoesRows = comissoes.map(c=>`<tr><td><input type="checkbox"></td><td><b>${c.id}</b></td><td><div class="name-cell"><div class="avatar-mini">${c.representante[0]}</div>${esc(c.representante)}</div></td><td>${c.pedido}</td><td>${esc(c.cliente)}</td><td>${BRL(c.valorVenda)}</td><td>${c.percentual}%</td><td><strong style="color:var(--primary)">${BRL(c.valorComissao)}</strong></td><td>${c.dataVencimento}</td><td>${c.dataPagamento||'—'}</td><td>${statusPill(c.status)}</td><td><div class="table-actions"><button class="link-btn" onclick="pagarComissao('${c.id}')">Pagar</button><button class="link-btn" onclick="verExtratoComissao('${c.id}')">Extrato</button></div></td></tr>`);
+  // ---- Ordenação ----
+  const sortData = (arr, colMap) => {
+    if(state.sortState.col === null) return arr;
+    const dir = state.sortState.dir === 'asc' ? 1 : -1;
+    return [...arr].sort((a,b) => {
+      const va = colMap(a), vb = colMap(b);
+      if(typeof va === 'number' && typeof vb === 'number') return (va-vb)*dir;
+      return String(va).localeCompare(String(vb),'pt-BR')*dir;
+    });
+  };
 
-  const barterRows = barter.map(b=>`<tr><td><b>${b.id}</b></td><td>${esc(b.cliente)}</td><td>${b.pedido}</td><td>${b.produto}</td><td>${b.quantidade} Sc</td><td>${BRL(b.precoSc)}/Sc</td><td>${BRL(b.valorTotal)}</td><td>${b.entregaPrevista}</td><td>${b.entregaRealizada||'—'}</td><td>${finBadge(b.status)}</td><td><div class="table-actions"><button class="link-btn" onclick="verContratoBarter('${b.id}')">Contrato</button></div></td></tr>`);
+  // ---- Tabela Contas a Receber ----
+  const receberRows = sortData(receberFiltered, r => r.valorVenda).map(r=>{
+    const pct = r.valorVenda>0 ? Math.round(r.valorRecebido/r.valorVenda*100) : 0;
+    const barColor = pct>=100 ? 'var(--fin-green)' : pct>0 ? 'var(--fin-yellow)' : 'var(--fin-line-dark)';
+    return `<tr><td><input type="checkbox" class="fin-checkbox" data-id="${r.id}" onclick="handleCheckbox(event,'${r.id}')"></td><td><b>${r.id}</b></td><td>${r.pedido}</td><td><div class="name-cell"><div class="avatar-mini">${r.cliente[0]}</div>${esc(r.cliente)}</div></td><td style="font-weight:800">${BRL(r.valorVenda)}</td><td style="color:var(--fin-green-dark);font-weight:800">${BRL(r.valorRecebido)}</td><td><div class="progress-bar"><i style="width:${pct}%;background:${barColor}"></i></div><small style="font-size:11px;font-weight:800;color:var(--fin-muted)">${pct}%</small></td><td>${r.dataPrevista}</td><td>${r.dataRecebida||'<span style="color:var(--fin-muted)">—</span>'}</td><td>${esc(r.formaPagamento)}</td><td>${finBadge(r.status)}</td><td><div class="table-actions"><button class="fin-link-btn" onclick="receberConta('${r.id}')" data-tooltip="Registrar recebimento">Receber</button><button class="fin-link-btn" onclick="verRecibo('${r.id}')" data-tooltip="Visualizar recibo">Recibo</button></div></td></tr>`;
+  });
 
-  const cprRows = cpr.map(c=>`<tr><td><b>${c.id}</b></td><td>${esc(c.cliente)}</td><td>${c.pedido}</td><td>${BRL(c.valor)}</td><td>${c.taxa}% a.a.</td><td>${c.vencimento}</td><td>${esc(c.banco)}</td><td>${finBadge(c.status)}</td><td><div class="table-actions"><button class="link-btn" onclick="verCpr('${c.id}')">Visualizar</button><button class="link-btn" onclick="anexarCpr('${c.id}')">Anexar PDF</button></div></td></tr>`);
+  // ---- Tabela Comissões ----
+  const comissoesRows = sortData(comissoesFiltered, c => c.valorComissao).map(c=>`<tr><td><input type="checkbox" class="fin-checkbox" data-id="${c.id}" onclick="handleCheckbox(event,'${c.id}')"></td><td><b>${c.id}</b></td><td><div class="name-cell"><div class="avatar-mini">${c.representante[0]}</div>${esc(c.representante)}</div></td><td>${c.pedido}</td><td>${esc(c.cliente)}</td><td>${BRL(c.valorVenda)}</td><td>${c.percentual}%</td><td><strong style="color:var(--fin-primary)">${BRL(c.valorComissao)}</strong></td><td>${c.dataVencimento}</td><td>${c.dataPagamento||'<span style="color:var(--fin-muted)">—</span>'}</td><td>${statusPill(c.status)}</td><td><div class="table-actions"><button class="fin-link-btn" onclick="pagarComissao('${c.id}')" data-tooltip="Registrar pagamento">Pagar</button><button class="fin-link-btn" onclick="verExtratoComissao('${c.id}')" data-tooltip="Ver extrato detalhado">Extrato</button></div></td></tr>`);
 
-  const boletoRows = boletos.map(b=>`<tr><td><b>${b.id}</b></td><td>${b.pedido}</td><td>${esc(b.cliente)}</td><td>${BRL(b.valor)}</td><td>${b.vencimento}</td><td>${b.parcela}</td><td>${finBadge(b.status)}</td><td><div class="table-actions"><button class="link-btn" onclick="downloadBoleto('${b.id}')">Baixar Boleto</button><button class="link-btn" onclick="copiarCodigo('${b.id}')">Copiar Codigo</button></div></td></tr>`);
+  // ---- Tabela Barter ----
+  const barterRows = barter.map(b=>`<tr><td><b>${b.id}</b></td><td>${esc(b.cliente)}</td><td>${b.pedido}</td><td>${b.produto}</td><td>${b.quantidade} Sc</td><td>${BRL(b.precoSc)}/Sc</td><td style="font-weight:800">${BRL(b.valorTotal)}</td><td>${b.entregaPrevista}</td><td>${b.entregaRealizada||'<span style="color:var(--fin-muted)">—</span>'}</td><td>${finBadge(b.status)}</td><td><div class="table-actions"><button class="fin-link-btn" onclick="verContratoBarter('${b.id}')" data-tooltip="Visualizar contrato">Contrato</button></div></td></tr>`);
 
-  const fluxoRows = fluxo.map(f=>`<tr><td><b>${f.mes}</b></td><td style="color:#15803d;font-weight:800">${BRL(f.entrada)}</td><td style="color:var(--red);font-weight:800">${BRL(f.saida)}</td><td style="font-weight:800;color:${f.saldo>=0?'#15803d':'var(--red)'}">${BRL(f.saldo)}</td></tr>`);
+  // ---- Tabela CPR ----
+  const cprRows = cpr.map(c=>`<tr><td><b>${c.id}</b></td><td>${esc(c.cliente)}</td><td>${c.pedido}</td><td style="font-weight:800">${BRL(c.valor)}</td><td>${c.taxa}% a.a.</td><td>${c.vencimento}</td><td>${esc(c.banco)}</td><td>${finBadge(c.status)}</td><td><div class="table-actions"><button class="fin-link-btn" onclick="verCpr('${c.id}')" data-tooltip="Visualizar documento">Visualizar</button><button class="fin-link-btn" onclick="anexarCpr('${c.id}')" data-tooltip="Anexar PDF assinado">Anexar PDF</button></div></td></tr>`);
 
+  // ---- Tabela Fluxo de Caixa ----
+  const fluxoRows = fluxo.map(f=>`<tr><td><b>${f.mes}</b></td><td style="color:var(--fin-green-dark);font-weight:800">${BRL(f.entrada)}</td><td style="color:var(--fin-red);font-weight:800">${BRL(f.saida)}</td><td style="font-weight:800;color:${f.saldo>=0?'var(--fin-green-dark)':'var(--fin-red)'}">${BRL(f.saldo)}</td></tr>`);
+
+  // ---- Inadimplência ----
   const inadimplentes = receber.filter(r=>r.status==='Vencido' || r.status==='Parcial');
   const inadimplentesHtml = inadimplentes.length ? inadimplentes.map(r=>{
     const restante = r.valorVenda - r.valorRecebido;
-    return `<div class="card panel fin-card-highlight ${r.status==='Vencido'?'red':'yellow'}"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div><h3 style="margin:0 0 6px;font-size:16px">${esc(r.cliente)}</h3><p style="margin:0;color:var(--muted);font-size:13px">Pedido ${r.pedido} - ${esc(r.formaPagamento)}</p></div><div style="text-align:right"><strong style="font-size:20px;color:var(--primary)">${BRL(restante)}</strong><div style="font-size:12px;color:var(--muted);font-weight:800;margin-top:2px">${r.status}</div></div></div><div class="fin-row-detail"><div><label>Valor da venda</label><span>${BRL(r.valorVenda)}</span></div><div><label>Recebido</label><span>${BRL(r.valorRecebido)}</span></div><div><label>Vencimento</label><span>${r.dataPrevista}</span></div><div><label>Dias em atraso</label><span style="color:var(--red)">15 dias</span></div></div></div>`;
-  }).join('') : '<p style="color:var(--muted);text-align:center;padding:20px">Nenhuma inadimplencia registrada.</p>';
+    const colorClass = r.status==='Vencido'?'red':'yellow';
+    const diasAtraso = r.status==='Vencido' ? '15 dias' : '8 dias';
+    return `<div class="card panel fin-card-highlight ${colorClass}"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div><h3 style="margin:0 0 6px;font-size:16px">${esc(r.cliente)}</h3><p style="margin:0;color:var(--fin-muted);font-size:13px">Pedido ${r.pedido} · ${esc(r.formaPagamento)}</p></div><div style="text-align:right"><strong style="font-size:20px;color:var(--fin-primary)">${BRL(restante)}</strong><div style="font-size:12px;color:var(--fin-muted);font-weight:800;margin-top:2px">${r.status}</div></div></div><div class="fin-row-detail"><div><label>Valor da venda</label><span>${BRL(r.valorVenda)}</span></div><div><label>Recebido</label><span style="color:var(--fin-green-dark)">${BRL(r.valorRecebido)}</span></div><div><label>Vencimento</label><span>${r.dataPrevista}</span></div><div><label>Dias em atraso</label><span style="color:var(--fin-red)">${diasAtraso}</span></div></div></div>`;
+  }).join('') : '<div class="card panel" style="text-align:center;padding:40px"><div style="font-size:48px;margin-bottom:16px">🎉</div><p style="color:var(--fin-muted);font-size:15px;font-weight:700;margin:0">Nenhuma inadimplência registrada</p><p style="color:var(--fin-muted);font-size:13px;margin-top:8px">Todos os recebimentos estão em dia</p></div>';
 
+  // ---- Gráfico Fluxo de Caixa ----
   const maxFluxo = Math.max(...fluxo.map(f=>Math.max(f.entrada, f.saida)));
   const chartHtml = fluxo.map((f,i)=>{
     const hE = Math.max(14, (f.entrada/maxFluxo)*160);
     const hS = Math.max(14, (f.saida/maxFluxo)*160);
-    return `<div class="chart-col"><span class="val" style="color:#15803d">${(f.entrada/1000).toFixed(0)}k</span><div class="chart-bars"><div class="chart-bar entrada" style="height:${hE}px"></div><div class="chart-bar saida" style="height:${hS}px"></div></div><label>${f.mes}</label></div>`;
+    return `<div class="chart-col" data-tooltip="Entrada: ${BRL(f.entrada)} | Saída: ${BRL(f.saida)} | Saldo: ${BRL(f.saldo)}"><span class="val" style="color:var(--fin-green-dark)">${(f.entrada/1000).toFixed(0)}k</span><div class="chart-bars"><div class="chart-bar entrada" style="height:${hE}px" data-val="${BRL(f.entrada)}"></div><div class="chart-bar saida" style="height:${hS}px" data-val="${BRL(f.saida)}"></div></div><label>${f.mes}</label></div>`;
   }).join('');
 
+  // ---- Doughnut Chart ----
   const pctRecebido = Math.round(totalRecebido/totalVendas*345);
   const pctParcial = Math.round(totalParcial/totalVendas*345);
   const pctVencido = Math.round(totalVencido/totalVendas*345);
   const offsetParcial = -pctRecebido;
   const offsetVencido = -(pctRecebido + pctParcial);
 
-  return pageHead('Financeiro', 'Gestao financeira completa: contas a receber, comissoes, barter, CPR, fluxo de caixa e inadimplencia.',
-    `<button class="btn secondary" onclick="exportar('financeiro')">Exportar Relatorio</button><button class="btn primary" onclick="novaReceita()">+ Nova Receita</button>`) +
+  // ---- Export Dropdown HTML ----
+  const exportDropdown = (section) => `
+    <div class="fin-export-wrap">
+      <button class="btn secondary" onclick="toggleExport(this)">Exportar ▾</button>
+      <div class="fin-export-menu">
+        <button onclick="exportarCSV('${section}', ['Titulo','Pedido','Cliente','Valor','Status'], [[]])">📊 Exportar CSV</button>
+        <button onclick="exportarPDF('${section}')">🖨️ Imprimir / PDF</button>
+      </div>
+    </div>`;
 
+  // ---- Search Bar HTML ----
+  const searchBar = (section, placeholder) => `
+    <div class="fin-search-bar">
+      <input type="text" placeholder="${placeholder}" oninput="onSearch('${section}',this.value)" value="${esc(state.filters[section]||'')}">
+      <select onchange="state.filters.${section}=this.value;render();">
+        <option value="todos" ${state.filters[section]==='todos'?'selected':''}>Todos</option>
+        <option value="Em aberto" ${state.filters[section]==='Em aberto'?'selected':''}>Em Aberto</option>
+        <option value="Parcial" ${state.filters[section]==='Parcial'?'selected':''}>Parcial</option>
+        <option value="Recebido" ${state.filters[section]==='Recebido'?'selected':''}>Recebido</option>
+        <option value="Vencido" ${state.filters[section]==='Vencido'?'selected':''}>Vencido</option>
+      </select>
+    </div>`;
+
+  return pageHead('Financeiro', 'Gestão financeira completa: contas a receber, comissões, barter, CPR, fluxo de caixa e inadimplência.',
+    `<div class="fin-export-wrap">
+      <button class="btn secondary" onclick="toggleExport(this)">Exportar Relatório ▾</button>
+      <div class="fin-export-menu">
+        <button onclick="exportarCSV('Financeiro_Geral', ['Modulo','Valor','Status'], [['Contas a Receber','${BRL(totalReceber)}','${receber.filter(r=>r.status==='Em aberto').length} titulos'],['Comissoes a Pagar','${BRL(totalComissoesPendentes+totalComissoesAtrasadas)}','${comissoes.filter(c=>c.status==='Atrasada').length} atrasadas'],['Barter','${BRL(totalBarter)}','${barter.length} contratos'],['CPR','${BRL(totalCpr)}','${cpr.length} titulos']])">📊 Exportar CSV</button>
+        <button onclick="exportarPDF('Financeiro')">🖨️ Imprimir / PDF</button>
+      </div>
+    </div>
+    <button class="btn primary" onclick="novaReceita()">+ Nova Receita</button>`) +
+
+  // ---- KPIs Linha 1 ----
   `<div class="fin-grid-3">` +
-    `<div class="card kpi fin-kpi-big"><div class="kpi-icon p">R$</div><div><span>Total a Receber</span><strong>${BRL(totalReceber)}</strong><div class="trend ${totalReceber>0?'down':'up'}">${receber.filter(r=>r.status==='Em aberto').length} titulos em aberto</div></div></div>` +
+    `<div class="card kpi fin-kpi-big"><div class="kpi-icon p">R$</div><div><span>Total a Receber</span><strong>${BRL(totalReceber)}</strong><div class="trend ${totalReceber>0?'down':'up'}">${receber.filter(r=>r.status==='Em aberto').length} títulos em aberto</div></div></div>` +
     `<div class="card kpi fin-kpi-big"><div class="kpi-icon g">✓</div><div><span>Total Recebido</span><strong>${BRL(totalRecebido)}</strong><div class="trend up">${Math.round(totalRecebido/totalVendas*100)}% da carteira</div></div></div>` +
-    `<div class="card kpi fin-kpi-big"><div class="kpi-icon r">!</div><div><span>Inadimplencia</span><strong>${BRL(totalVencido + totalParcial)}</strong><div class="trend down">${inadimplentes.length} cliente(s) em atraso</div></div></div>` +
+    `<div class="card kpi fin-kpi-big"><div class="kpi-icon r">!</div><div><span>Inadimplência</span><strong>${BRL(totalVencido + totalParcial)}</strong><div class="trend down">${inadimplentes.length} cliente(s) em atraso</div></div></div>` +
   `</div>` +
 
+  // ---- KPIs Linha 2 ----
   `<div class="fin-grid-3">` +
-    `<div class="card kpi fin-kpi-big"><div class="kpi-icon b">⇄</div><div><span>Saldo Caixa</span><strong>${BRL(saldoCaixa)}</strong><div class="trend up">Projecao 6 meses</div></div></div>` +
-    `<div class="card kpi fin-kpi-big"><div class="kpi-icon y">%</div><div><span>Comissoes a Pagar</span><strong>${BRL(totalComissoesPendentes + totalComissoesAtrasadas)}</strong><div class="trend ${totalComissoesAtrasadas>0?'down':'up'}">${comissoes.filter(c=>c.status==='Atrasada').length} atrasada(s)</div></div></div>` +
-    `<div class="card kpi fin-kpi-big"><div class="kpi-icon p">🌾</div><div><span>Barter / CPR</span><strong>${BRL(totalBarter + totalCpr)}</strong><div class="trend">${barter.length} barter - ${cpr.length} CPR</div></div></div>` +
+    `<div class="card kpi fin-kpi-big"><div class="kpi-icon b">⇄</div><div><span>Saldo Caixa</span><strong>${BRL(saldoCaixa)}</strong><div class="trend up">Projeção 6 meses</div></div></div>` +
+    `<div class="card kpi fin-kpi-big"><div class="kpi-icon y">%</div><div><span>Comissões a Pagar</span><strong>${BRL(totalComissoesPendentes + totalComissoesAtrasadas)}</strong><div class="trend ${totalComissoesAtrasadas>0?'down':'up'}">${comissoes.filter(c=>c.status==='Atrasada').length} atrasada(s)</div></div></div>` +
+    `<div class="card kpi fin-kpi-big"><div class="kpi-icon p">🌾</div><div><span>Barter / CPR</span><strong>${BRL(totalBarter + totalCpr)}</strong><div class="trend">${barter.length} barter · ${cpr.length} CPR</div></div></div>` +
   `</div>` +
 
+  // ---- Gráficos: Fluxo de Caixa + Carteira ----
   `<div class="grid-2">` +
-    `<div class="card panel"><div class="panel-title"><h2>Fluxo de Caixa</h2><span>Entradas × Saidas (6 meses)</span></div>` +
+    `<div class="card panel"><div class="panel-title"><h2>Fluxo de Caixa</h2><span>Entradas × Saídas (6 meses)</span></div>` +
     `<div class="chart-area">${chartHtml}</div>` +
-    `<div class="chart-legend"><span><span class="dot" style="background:var(--green)"></span> Entradas</span><span><span class="dot" style="background:var(--red);opacity:.7"></span> Saidas</span></div>` +
+    `<div class="chart-legend"><span><span class="dot" style="background:var(--fin-green)"></span> Entradas</span><span><span class="dot" style="background:var(--fin-red);opacity:.7"></span> Saídas</span></div>` +
     `</div>` +
-    `<div class="card panel"><div class="panel-title"><h2>Carteira de Recebimentos</h2><span>Distribuicao por status</span></div>` +
+    `<div class="card panel"><div class="panel-title"><h2>Carteira de Recebimentos</h2><span>Distribuição por status</span></div>` +
     `<div style="display:flex;align-items:center;gap:20px;padding:10px 0">` +
       `<div class="doughnut-wrap">` +
         `<svg viewBox="0 0 140 140" width="130" height="130">` +
@@ -399,76 +835,98 @@ function financeiro(){
           `<circle cx="70" cy="70" r="52" fill="none" stroke="#f59e0b" stroke-width="16" stroke-dasharray="${pctParcial} ${345-pctParcial}" stroke-dashoffset="${offsetParcial}" stroke-linecap="round"/>` +
           `<circle cx="70" cy="70" r="52" fill="none" stroke="#ef4444" stroke-width="16" stroke-dasharray="${pctVencido} ${345-pctVencido}" stroke-dashoffset="${offsetVencido}" stroke-linecap="round"/>` +
         `</svg>` +
-        `<div class="doughnut-center"><strong>${BRL(totalVendas)}</strong><span>Carteira</span></div>` +
+        `<div class="doughnut-center"><strong>${BRL(totalVendas)}</strong><span>Carteira Total</span></div>` +
       `</div>` +
       `<div class="legend-grid" style="flex:1">` +
-        `<div class="legend-row"><span class="legend-dot" style="background:var(--green)"></span><span>Recebido</span><strong>${BRL(totalRecebido)}</strong></div>` +
-        `<div class="legend-row"><span class="legend-dot" style="background:var(--yellow)"></span><span>Parcial</span><strong>${BRL(totalParcial)}</strong></div>` +
-        `<div class="legend-row"><span class="legend-dot" style="background:var(--red)"></span><span>Vencido</span><strong>${BRL(totalVencido)}</strong></div>` +
-        `<div class="legend-row"><span class="legend-dot" style="background:var(--line-dark)"></span><span>Em aberto</span><strong>${BRL(totalEmAberto)}</strong></div>` +
+        `<div class="legend-row"><span class="legend-dot" style="background:var(--fin-green)"></span><span>Recebido</span><strong>${BRL(totalRecebido)}</strong></div>` +
+        `<div class="legend-row"><span class="legend-dot" style="background:var(--fin-yellow)"></span><span>Parcial</span><strong>${BRL(totalParcial)}</strong></div>` +
+        `<div class="legend-row"><span class="legend-dot" style="background:var(--fin-red)"></span><span>Vencido</span><strong>${BRL(totalVencido)}</strong></div>` +
+        `<div class="legend-row"><span class="legend-dot" style="background:var(--fin-line-dark)"></span><span>Em aberto</span><strong>${BRL(totalEmAberto)}</strong></div>` +
       `</div>` +
     `</div></div>` +
   `</div>` +
 
-  `<div class="fin-section-title"><h2>💳 Formas de Pagamento</h2><span>Boleto · PIX · Transferencia · Barter</span></div>` +
-  `<div class="info-box">` +
-    `<strong>Como funciona?</strong> A industria oferece multiplas formas de pagamento ao produtor. O <i>Boleto</i> e emitido junto com a nota fiscal e pode ser baixado pelo produtor na plataforma. O <i>PIX</i> e <i>Transferencia Bancaria</i> sao pagamentos a vista. O <i>Barter</i> e uma troca por grao — o produtor fica devendo em soja, milho ou outro grao acordado, em vez de pagar em dinheiro.` +
-  `</div>` +
-  `<div class="card panel"><div class="panel-title"><h2>📄 Boletos Emitidos</h2><span>${boletos.length} boletos · Download disponivel para o produtor</span></div>` +
-  `<div class="card panel">${table(['Boleto','Pedido','Cliente','Valor','Vencimento','Parcela','Status','Acoes'], boletoRows)}</div>` +
+  // ---- Resumo Rápido ----
+  `<div class="fin-quick-summary">` +
+    `<div class="fin-quick-item"><div class="label">Recebimentos Hoje</div><div class="value" style="color:var(--fin-green-dark)">${BRL(0)}</div><div class="sub">Nenhum previsto</div></div>` +
+    `<div class="fin-quick-item"><div class="label">Vencendo em 7 dias</div><div class="value" style="color:var(--fin-yellow)">${BRL(totalEmAberto)}</div><div class="sub">${receber.filter(r=>r.status==='Em aberto').length} títulos</div></div>` +
+    `<div class="fin-quick-item"><div class="label">Taxa de Recebimento</div><div class="value" style="color:var(--fin-blue)">${Math.round(totalRecebido/totalVendas*100)}%</div><div class="sub">Meta: 85%</div></div>` +
+    `<div class="fin-quick-item"><div class="label">Média de Atraso</div><div class="value" style="color:var(--fin-red)">12 dias</div><div class="sub">${inadimplentes.length} clientes</div></div>` +
   `</div>` +
 
-  `<div class="fin-section-title"><h2>📥 Contas a Receber</h2><span>${receber.length} titulos · ${BRL(totalReceber)} em aberto</span></div>` +
+  // ---- Contas a Receber ----
+  `<div class="fin-section-title"><h2>📥 Contas a Receber</h2><span>${receberFiltered.length} de ${receber.length} títulos · ${BRL(totalReceber)} em aberto</span></div>` +
+  searchBar('receber', 'Buscar por cliente, pedido ou título...') +
   `<div class="fin-actions">` +
-    `<button class="btn secondary" onclick="filtrarReceber('todos')">Todos</button>` +
-    `<button class="btn secondary" onclick="filtrarReceber('Em aberto')">Em Aberto</button>` +
-    `<button class="btn secondary" onclick="filtrarReceber('Parcial')">Parcial</button>` +
-    `<button class="btn secondary" onclick="filtrarReceber('Recebido')">Recebido</button>` +
-    `<button class="btn secondary" onclick="filtrarReceber('Vencido')">Vencido</button>` +
-    `<button class="btn primary" onclick="receberSelecionados()" style="margin-left:auto">Receber Selecionados</button>` +
+    `<button class="btn secondary" onclick="state.filters.receber='todos';render();">Todos</button>` +
+    `<button class="btn secondary" onclick="state.filters.receber='Em aberto';render();">Em Aberto</button>` +
+    `<button class="btn secondary" onclick="state.filters.receber='Parcial';render();">Parcial</button>` +
+    `<button class="btn secondary" onclick="state.filters.receber='Recebido';render();">Recebido</button>` +
+    `<button class="btn secondary" onclick="state.filters.receber='Vencido';render();">Vencido</button>` +
+    `<button class="btn primary" onclick="receberSelecionados()" style="margin-left:auto" data-tooltip="Receber títulos selecionados">Receber Selecionados</button>` +
   `</div>` +
-  `<div class="card panel">${table(['','Titulo','Pedido','Cliente','Valor da Venda','Valor Recebido','Progresso','Data Prevista','Data Recebida','Forma de Pagamento','Status','Acoes'], receberRows)}</div>` +
+  `<div class="card panel">${table(['','Título','Pedido','Cliente','Valor da Venda','Valor Recebido','Progresso','Data Prevista','Data Recebida','Forma de Pagamento','Status','Ações'], receberRows, 'Nenhum título encontrado com os filtros aplicados.', true)}</div>` +
 
-  `<div class="fin-section-title"><h2>% Comissoes a Pagar</h2><span>${comissoes.length} titulos · ${BRL(totalComissoesPendentes + totalComissoesAtrasadas)} pendente</span></div>` +
+  // ---- Comissões a Pagar ----
+  `<div class="fin-section-title"><h2>% Comissões a Pagar</h2><span>${comissoesFiltered.length} de ${comissoes.length} títulos · ${BRL(totalComissoesPendentes + totalComissoesAtrasadas)} pendente</span></div>` +
+  `<div class="fin-search-bar">` +
+    `<input type="text" placeholder="Buscar por representante, cliente ou título..." oninput="onSearch('comissoes',this.value)" value="${esc(state.filters.comissoes||'')}">` +
+    `<select onchange="state.filters.comissoes=this.value;render();">` +
+      `<option value="todos" ${state.filters.comissoes==='todos'?'selected':''}>Todos</option>` +
+      `<option value="A pagar" ${state.filters.comissoes==='A pagar'?'selected':''}>A Pagar</option>` +
+      `<option value="Paga" ${state.filters.comissoes==='Paga'?'selected':''}>Pagas</option>` +
+      `<option value="Atrasada" ${state.filters.comissoes==='Atrasada'?'selected':''}>Atrasadas</option>` +
+    `</select>` +
+  `</div>` +
   `<div class="fin-actions">` +
-    `<button class="btn secondary" onclick="filtrarComissoes('todos')">Todos</button>` +
-    `<button class="btn secondary" onclick="filtrarComissoes('A pagar')">A Pagar</button>` +
-    `<button class="btn secondary" onclick="filtrarComissoes('Paga')">Pagas</button>` +
-    `<button class="btn secondary" onclick="filtrarComissoes('Atrasada')">Atrasadas</button>` +
-    `<button class="btn primary" onclick="pagarComissoesSelecionadas()" style="margin-left:auto">Pagar Selecionadas</button>` +
+    `<button class="btn secondary" onclick="state.filters.comissoes='todos';render();">Todos</button>` +
+    `<button class="btn secondary" onclick="state.filters.comissoes='A pagar';render();">A Pagar</button>` +
+    `<button class="btn secondary" onclick="state.filters.comissoes='Paga';render();">Pagas</button>` +
+    `<button class="btn secondary" onclick="state.filters.comissoes='Atrasada';render();">Atrasadas</button>` +
+    `<button class="btn primary" onclick="pagarComissoesSelecionadas()" style="margin-left:auto" data-tooltip="Pagar comissões selecionadas">Pagar Selecionadas</button>` +
   `</div>` +
-  `<div class="card panel">${table(['','Titulo','Representante','Pedido','Cliente','Valor Venda','%','Valor Comissao','Vencimento','Pagamento','Status','Acoes'], comissoesRows)}</div>` +
+  `<div class="card panel">${table(['','Título','Representante','Pedido','Cliente','Valor Venda','%','Valor Comissão','Vencimento','Pagamento','Status','Ações'], comissoesRows, 'Nenhuma comissão encontrada com os filtros aplicados.', true)}</div>` +
 
-  `<div class="fin-section-title"><h2>🌾 Barter — Forma de Pagamento (Troca por Grao)</h2><span>${barter.length} contratos · ${BRL(totalBarter)}</span></div>` +
+  // ---- Barter ----
+  `<div class="fin-section-title"><h2>🌾 Barter — Forma de Pagamento (Troca por Grão)</h2><span>${barter.length} contratos · ${BRL(totalBarter)}</span></div>` +
   `<div class="info-box">` +
-    `<strong>O que e Barter?</strong> O Barter e uma <i>forma de pagamento</i> oferecida pela industria. Em vez de pagar em dinheiro (boleto, PIX ou transferencia), o produtor fica devendo em grao (soja, milho, etc.). A entrega do grao liquida o debito da compra realizada. E uma alternativa ao pagamento convencional, nao uma garantia.` +
+    `<strong>O que é Barter?</strong> O Barter é uma <i>forma de pagamento</i> oferecida pela indústria. Em vez de pagar em dinheiro (boleto, PIX ou transferência), o produtor fica devendo em grão (soja, milho, etc.). A entrega do grão liquida o débito da compra realizada. É uma alternativa ao pagamento convencional, não uma garantia.` +
   `</div>` +
-  `<div class="card panel">${table(['Contrato','Cliente','Pedido','Produto','Quantidade','Preco/Sc','Valor Total','Entrega Prevista','Entrega Realizada','Status','Acoes'], barterRows)}</div>` +
+  `<div class="card panel">${table(['Contrato','Cliente','Pedido','Produto','Quantidade','Preço/Sc','Valor Total','Entrega Prevista','Entrega Realizada','Status','Ações'], barterRows)}</div>` +
 
-  `<div class="fin-section-title"><h2>📜 CPR — Cedula de Produto Rural (Garantia)</h2><span>${cpr.length} titulos · ${BRL(totalCpr)}</span></div>` +
+  // ---- CPR ----
+  `<div class="fin-section-title"><h2>📜 CPR — Cédula de Produto Rural (Garantia)</h2><span>${cpr.length} títulos · ${BRL(totalCpr)}</span></div>` +
   `<div class="info-box">` +
-    `<strong>O que e CPR?</strong> A CPR e uma <i>garantia</i> emitida pelo agricultor para garantir uma compra. E um documento assinado pelo produtor (em PDF) que serve de garantia na hora de avaliar credito. O produtor faz o upload do arquivo PDF assinado para a empresa, que o utiliza como garantia da compra realizada. <i>Diferente do Barter, a CPR nao e forma de pagamento — e garantia.</i>` +
+    `<strong>O que é CPR?</strong> A CPR é uma <i>garantia</i> emitida pelo agricultor para garantir uma compra. É um documento assinado pelo produtor (em PDF) que serve de garantia na hora de avaliar crédito. O produtor faz o upload do arquivo PDF assinado para a empresa, que o utiliza como garantia da compra realizada. <i>Diferente do Barter, a CPR não é forma de pagamento — é garantia.</i>` +
   `</div>` +
-  `<div class="card panel">${table(['CPR','Cliente','Pedido','Valor','Taxa','Vencimento','Banco','Status','Acoes'], cprRows)}</div>` +
+  `<div class="card panel">${table(['CPR','Cliente','Pedido','Valor','Taxa','Vencimento','Banco','Status','Ações'], cprRows)}</div>` +
 
-  `<div class="fin-section-title"><h2>💰 Fluxo de Caixa Detalhado</h2><span>Ultimos 6 meses</span></div>` +
-  `<div class="card panel">${table(['Mes','Entradas','Saidas','Saldo'], fluxoRows)}</div>` +
+  // ---- Fluxo de Caixa Detalhado ----
+  `<div class="fin-section-title"><h2>💰 Fluxo de Caixa Detalhado</h2><span>Últimos 6 meses · Projeção de saldo</span></div>` +
+  `<div class="card panel">${table(['Mês','Entradas','Saídas','Saldo'], fluxoRows)}</div>` +
 
-  `<div class="fin-section-title"><h2>⚠️ Inadimplencia e Atrasos</h2><span>${inadimplentes.length} cliente(s) com pendencia</span></div>` +
+  // ---- Inadimplência ----
+  `<div class="fin-section-title"><h2>⚠️ Inadimplência e Atrasos</h2><span>${inadimplentes.length} cliente(s) com pendência</span></div>` +
   `<div class="grid-2">${inadimplentesHtml}</div>`;
 }
+
+
+// ================================================================
+// AÇÕES E MODAIS
+// ================================================================
 
 function receberConta(id){
   const rec = state.financeiro.contasReceber.find(r=>r.id===id);
   if(!rec) return;
+  const restante = rec.valorVenda - rec.valorRecebido;
   modal('Receber Conta', `<div class="form-grid">
     ${input('rcliente','Cliente',rec.cliente)}
     ${input('rvalor','Valor da Venda',BRL(rec.valorVenda))}
     ${input('rrecebido','Valor Recebido',BRL(rec.valorRecebido))}
-    ${input('rreceber','Valor a Receber',BRL(rec.valorVenda-rec.valorRecebido))}
+    ${input('rreceber','Valor a Receber',BRL(restante))}
     ${input('rdataprev','Data Prevista',rec.dataPrevista)}
     ${input('rdatarec','Data Recebida',new Date().toLocaleDateString('pt-BR'))}
-    ${select('rforma','Forma de Pagamento',['Boleto','PIX','Transferencia Bancaria','Barter (Troca por Grao)','Cartao'],rec.formaPagamento.split(' ')[0])}
+    ${select('rforma','Forma de Pagamento',['Boleto','PIX','Transferência Bancária','Barter (Troca por Grão)','Cartão'],rec.formaPagamento.split(' ')[0])}
     ${select('rstatus','Status',['Em aberto','Parcial','Recebido','Vencido'],rec.status)}
   </div>`,()=>{
     const d = getFormData(['rcliente','rvalor','rrecebido','rreceber','rdataprev','rdatarec','rforma','rstatus']);
@@ -476,20 +934,22 @@ function receberConta(id){
     rec.dataRecebida = d.rdatarec;
     rec.formaPagamento = d.rforma;
     rec.status = d.rstatus;
-    render(); showToast(`Conta ${id} atualizada com sucesso`);
+    if(d.rstatus === 'Recebido') rec.valorRecebido = rec.valorVenda;
+    if(d.rstatus === 'Parcial') rec.valorRecebido = Math.min(rec.valorVenda, rec.valorRecebido + Number(d.rreceber.replace(/[^\d.,]/g,'').replace('.','').replace(',','.')) || 0);
+    render(); showToast(`Conta ${id} atualizada com sucesso`, 'ok');
   },'Salvar Recebimento');
 }
 
 function pagarComissao(id){
   const com = state.financeiro.comissoesPagar.find(c=>c.id===id);
   if(!com) return;
-  modal('Pagar Comissao', `<div class="form-grid">
+  modal('Pagar Comissão', `<div class="form-grid">
     ${input('crep','Representante',com.representante)}
     ${input('cpedido','Pedido',com.pedido)}
     ${input('ccliente','Cliente',com.cliente)}
     ${input('cvalor','Valor da Venda',BRL(com.valorVenda))}
     ${input('cperc','Percentual',com.percentual+'%')}
-    ${input('ccomissao','Valor Comissao',BRL(com.valorComissao))}
+    ${input('ccomissao','Valor Comissão',BRL(com.valorComissao))}
     ${input('cvenc','Vencimento',com.dataVencimento)}
     ${input('cpag','Data Pagamento',new Date().toLocaleDateString('pt-BR'))}
     ${select('cstatus','Status',['A pagar','Paga','Atrasada'],com.status)}
@@ -497,19 +957,26 @@ function pagarComissao(id){
     const d = getFormData(['crep','cpedido','ccliente','cvalor','cperc','ccomissao','cvenc','cpag','cstatus']);
     com.dataPagamento = d.cpag;
     com.status = d.cstatus;
-    render(); showToast(`Comissao ${id} paga com sucesso`);
+    render(); showToast(`Comissão ${id} paga com sucesso`, 'ok');
   },'Confirmar Pagamento');
 }
 
-function verRecibo(id){ showToast(`Recibo ${id} gerado (simulacao)`); }
-function verExtratoComissao(id){ showToast(`Extrato de comissao ${id} gerado (simulacao)`); }
-function verContratoBarter(id){ showToast(`Contrato Barter ${id} aberto (simulacao)`); }
+function verRecibo(id){ 
+  showToast(`Recibo ${id} gerado e disponível para download`, 'info'); 
+}
+function verExtratoComissao(id){ 
+  showToast(`Extrato de comissão ${id} gerado`, 'info'); 
+}
+function verContratoBarter(id){ 
+  showToast(`Contrato Barter ${id} aberto para visualização`, 'info'); 
+}
+
 function verCpr(id){ 
   const cpr = state.financeiro.cpr.find(c=>c.id===id);
   if(!cpr) return;
-  modal('Visualizar CPR - Cedula de Produto Rural', `
+  modal('Visualizar CPR — Cédula de Produto Rural', `
     <div style="margin-bottom:16px">
-      <p style="font-size:13px;color:var(--muted);margin:0 0 12px">A CPR e uma garantia emitida pelo agricultor. Abaixo estao os detalhes da CPR e o documento PDF assinado pelo produtor.</p>
+      <p style="font-size:13px;color:var(--fin-muted);margin:0 0 12px">A CPR é uma garantia emitida pelo agricultor. Abaixo estão os detalhes da CPR e o documento PDF assinado pelo produtor.</p>
       <div class="form-grid">
         ${input('vcpr','CPR',cpr.id)}
         ${input('vcliente','Cliente',cpr.cliente)}
@@ -537,78 +1004,104 @@ function verCpr(id){
 function anexarCpr(id){
   const cpr = state.financeiro.cpr.find(c=>c.id===id);
   if(!cpr) return;
-  modal('Anexar CPR - Documento de Garantia', `
+  modal('Anexar CPR — Documento de Garantia', `
     <div style="margin-bottom:16px">
-      <p style="font-size:13px;color:var(--muted);margin:0 0 12px">A CPR e uma garantia emitida pelo agricultor. Faca o upload do arquivo PDF assinado pelo produtor para vincular como garantia da compra.</p>
+      <p style="font-size:13px;color:var(--fin-muted);margin:0 0 12px">A CPR é uma garantia emitida pelo agricultor. Faça o upload do arquivo PDF assinado pelo produtor para vincular como garantia da compra.</p>
       <div class="form-grid">
         ${input('acpr','CPR',cpr.id)}
         ${input('acliente','Cliente',cpr.cliente)}
         ${input('apedido','Pedido',cpr.pedido)}
       </div>
     </div>
-    <div class="upload-zone" onclick="showToast('Selecao de arquivo simulada')">
+    <div class="upload-zone" onclick="showToast('Seleção de arquivo simulada', 'info')">
       <div class="icon">📤</div>
       <p>Clique para fazer upload do PDF da CPR</p>
-      <small>Formato aceito: PDF assinado pelo agricultor · Max. 10 MB</small>
+      <small>Formato aceito: PDF assinado pelo agricultor · Máx. 10 MB</small>
     </div>
     <div style="margin-top:12px;padding:10px 12px;background:#f0fdf4;border-radius:8px;border:1px solid #bbf7d0">
-      <p style="margin:0;font-size:12px;color:#15803d;font-weight:700">✓ O arquivo sera vinculado como garantia da compra realizada</p>
+      <p style="margin:0;font-size:12px;color:var(--fin-green-dark);font-weight:700">✓ O arquivo será vinculado como garantia da compra realizada</p>
     </div>
   `,()=>{
     cpr.arquivoCPR = 'cpr_' + cpr.cliente.toLowerCase().replace(/\s+/g,'_') + '_' + cpr.pedido + '.pdf';
     cpr.arquivoTamanho = '2.1 MB';
-    render(); showToast(`CPR ${id} - PDF anexado com sucesso`);
+    render(); showToast(`CPR ${id} — PDF anexado com sucesso`, 'ok');
   },'Anexar Documento');
 }
 
-function downloadCpr(id){ showToast(`Download do PDF da CPR ${id} iniciado (simulacao)`); }
-function downloadBoleto(id){ showToast(`Boleto ${id} baixado com sucesso (simulacao)`); }
-function copiarCodigo(id){ 
-  const bol = state.financeiro.boletos.find(b=>b.id===id);
-  if(bol){
-    navigator.clipboard?.writeText(bol.codigoBarras);
-    showToast(`Codigo de barras copiado: ${bol.codigoBarras.substring(0,20)}...`);
-  }
-}
-function novaReceita(){ showToast('Nova receita criada no prototipo'); }
-function receberSelecionados(){ showToast('Recebimentos em massa processados'); }
-function pagarComissoesSelecionadas(){ showToast('Comissoes pagas em massa'); }
-
-function filtrarReceber(filtro){
-  const term = filtro==='todos'?'':filtro;
-  const tbody = document.querySelector('.table-wrap tbody');
-  if(!tbody) return;
-  const rows = state.financeiro.contasReceber;
-  const filtered = term?rows.filter(r=>r.status===term):rows;
-  tbody.innerHTML = filtered.map(r=>{
-    const pct = r.valorVenda>0 ? Math.round(r.valorRecebido/r.valorVenda*100) : 0;
-    return `<tr><td><input type="checkbox"></td><td><b>${r.id}</b></td><td>${r.pedido}</td><td><div class="name-cell"><div class="avatar-mini">${r.cliente[0]}</div>${esc(r.cliente)}</div></td><td>${BRL(r.valorVenda)}</td><td>${BRL(r.valorRecebido)}</td><td><div class="progress-bar"><i style="width:${pct}%;background:${pct>=100?'var(--green)':pct>0?'var(--yellow)':'var(--line-dark)'};transition:width .4s"></i></div><small style="font-size:11px;font-weight:800;color:var(--muted)">${pct}%</small></td><td>${r.dataPrevista}</td><td>${r.dataRecebida||'—'}</td><td>${esc(r.formaPagamento)}</td><td>${finBadge(r.status)}</td><td><div class="table-actions"><button class="link-btn" onclick="receberConta('${r.id}')">Receber</button><button class="link-btn" onclick="verRecibo('${r.id}')">Recibo</button></div></td></tr>`;
-  }).join('');
-  if(!filtered.length) tbody.innerHTML = `<tr><td colspan="12" class="empty">Nenhum registro encontrado.</td></tr>`;
+function downloadCpr(id){ 
+  showToast(`Download do PDF da CPR ${id} iniciado`, 'info'); 
 }
 
-function filtrarComissoes(filtro){
-  const term = filtro==='todos'?'':filtro;
-  const tbodies = document.querySelectorAll('.table-wrap tbody');
-  const tbody = tbodies[1];
-  if(!tbody) return;
-  const rows = state.financeiro.comissoesPagar;
-  const filtered = term?rows.filter(r=>r.status===term):rows;
-  tbody.innerHTML = filtered.map(c=>`<tr><td><input type="checkbox"></td><td><b>${c.id}</b></td><td><div class="name-cell"><div class="avatar-mini">${c.representante[0]}</div>${esc(c.representante)}</div></td><td>${c.pedido}</td><td>${esc(c.cliente)}</td><td>${BRL(c.valorVenda)}</td><td>${c.percentual}%</td><td><strong style="color:var(--primary)">${BRL(c.valorComissao)}</strong></td><td>${c.dataVencimento}</td><td>${c.dataPagamento||'—'}</td><td>${statusPill(c.status)}</td><td><div class="table-actions"><button class="link-btn" onclick="pagarComissao('${c.id}')">Pagar</button><button class="link-btn" onclick="verExtratoComissao('${c.id}')">Extrato</button></div></td></tr>`).join('');
-  if(!filtered.length) tbody.innerHTML = `<tr><td colspan="12" class="empty">Nenhum registro encontrado.</td></tr>`;
+function novaReceita(){ 
+  modal('Nova Receita', `<div class="form-grid">
+    ${input('ncliente','Cliente','')}
+    ${input('npedido','Pedido','')}
+    ${input('nvalor','Valor da Venda','')}
+    ${input('ndata','Data Prevista',new Date().toLocaleDateString('pt-BR'))}
+    ${select('nforma','Forma de Pagamento',['Boleto','PIX','Transferência Bancária','Barter (Troca por Grão)','Cartão'])}
+    ${select('nstatus','Status',['Em aberto','Parcial','Recebido'])}
+  </div>`,()=>{
+    const d = getFormData(['ncliente','npedido','nvalor','ndata','nforma','nstatus']);
+    const newId = 'REC-' + String(state.financeiro.contasReceber.length + 1).padStart(3,'0');
+    state.financeiro.contasReceber.push({
+      id: newId, pedido: d.npedido, cliente: d.ncliente,
+      valorVenda: Number(d.nvalor.replace(/[^\d.,]/g,'').replace('.','').replace(',','.')) || 0,
+      valorRecebido: 0, dataPrevista: d.ndata, dataRecebida: '',
+      formaPagamento: d.nforma, status: d.nstatus, parcela: '1/1'
+    });
+    render(); showToast(`Nova receita ${newId} criada com sucesso`, 'ok');
+  }, 'Criar Receita');
 }
 
+function receberSelecionados(){ 
+  showToast('Recebimentos em massa processados com sucesso', 'ok'); 
+}
+function pagarComissoesSelecionadas(){ 
+  showToast('Comissões pagas em massa com sucesso', 'ok'); 
+}
+
+// ================================================================
+// RENDER E INICIALIZAÇÃO
+// ================================================================
 function render(){
   const content = document.getElementById('content');
   content.innerHTML = financeiro();
+
+  // Adiciona indicador de scroll em tabelas
+  document.querySelectorAll('.fin-table-wrap').forEach(wrap => {
+    wrap.addEventListener('scroll', () => wrap.classList.toggle('scrolled', wrap.scrollLeft > 10));
+  });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('openSidebar').onclick = () => {document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('open');};
-  document.getElementById('closeSidebar').onclick = () => {document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open');};
-  document.getElementById('overlay').onclick = () => {document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open');};
+  document.getElementById('openSidebar').onclick = () => {
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('overlay').classList.add('open');
+  };
+  document.getElementById('closeSidebar').onclick = () => {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('open');
+  };
+  document.getElementById('overlay').onclick = () => {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('open');
+  };
   document.getElementById('modalClose').onclick = closeModal;
   document.getElementById('modalCancel').onclick = closeModal;
+
+  // Atalhos de teclado
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape') closeModal();
+    if(e.ctrlKey && e.key === 'k'){
+      e.preventDefault();
+      document.getElementById('globalSearch').focus();
+    }
+    if(e.ctrlKey && e.key === 'p'){
+      e.preventDefault();
+      window.print();
+    }
+  });
+
   render();
 });
   </script>
